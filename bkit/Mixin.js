@@ -29,16 +29,31 @@ define('bkit/Mixin', ['require', 'underscore'], function (require, _) {
      *
      * @param obj
      */
-    return   function (mixins, obj) {
-        var definition = obj;
-        definition.mixins = {};
-        definition.isMixin = function () {
+    return   function (mixins, def) {
+        function Mixin() {
+            for (var i = Mixin.prototype.constructors.length - 1; i >= 0; i--) {
+                //apply with the proxy's context means each "super" constructor modifies the instance if they use this.
+                Mixin.prototype.constructors[i].apply(this, arguments)
+            }
+            def.apply(this, arguments);
+        }
+
+        Mixin.prototype.constructors = def.prototype.constructors ? def.prototype.constructors : [];
+        Mixin.prototype.constructor.name = def.constructor.name;
+        Mixin.prototype.mixins = {};
+
+        Mixin.prototype.isMixin = function () {
             return true;
         };
+        //copy all properties from the definitions prototype to the proxy's
+        _.each(def.prototype, function (value, name) {
+            Mixin.prototype[name] = value;
+        });
         function doMixin(mixin, mixinPath, _with, without, force) {
-            definition.mixins[mixinPath] = mixin;
-            //for each property in the mixin, mix it into the definition observing with,without and force rules
-            _.each(mixin, function (value, name) {
+            mixinPath = mixin.prototype.type ? mixin.prototype.type : _.isString(mixinPath) ? mixinPath : 'unknown';
+            Mixin.prototype.constructors.push(mixin);
+            Mixin.prototype.mixins[mixinPath] = mixin;
+            _.each(mixin.prototype, function (value, name) {
                 //if with is specified then only names in the _with array are allowed to be mixed in
                 //so if name isn't found then return without doing anything
                 if (_with.length > 0 && _.indexOf(_with, name) == -1) {
@@ -50,23 +65,26 @@ define('bkit/Mixin', ['require', 'underscore'], function (require, _) {
                     return;
                 }
 
-                if (name) {
-                    //if this property isn't already defined then add it
-                    if (!definition[name]) {
-                        definition[name] = value;
-                        if (definition[name]) {
-                            definition[name].defined_by = mixinPath;
+                //if this property isn't already defined then add it
+                if (!Mixin.prototype[name]) {
+                    Mixin.prototype[name] = value;
+                    if (Mixin[name]) {
+                        Mixin[name].defined_by = mixinPath;
+                        //definition[name].definition = mixin;
+                    }
+                } else {
+                    console.log('mixing 4', name);
+                    //if the name is already defined it should be over written if and only if
+                    //definition[name].defined_by is present AND force contains name
+                    if (force.length > 0
+                        //&& definition.prototype[name].defined_by //only override properties defined through mixins?
+                        && _.indexOf(force, name) != -1) {
+                        console.log('mixing 5', name);
+                        Mixin.prototype[name] = value;
+                        if (Mixin.prototype[name]) {
+                            console.log('mixing 6', name);
+                            Mixin.prototype[name].defined_by = mixinPath;
                             //definition[name].definition = mixin;
-                        }
-                    } else {
-                        //if the name is already defined it should be over written if and only if
-                        //definition[name].defined_by is present AND force contains name
-                        if (force.length > 0 && definition[name]['defined_by'] && _.indexOf(force, name) != -1) {
-                            definition[name] = value;
-                            if (definition[name]) {
-                                definition[name].defined_by = mixinPath;
-                                //definition[name].definition = mixin;
-                            }
                         }
                     }
                 }
@@ -75,19 +93,12 @@ define('bkit/Mixin', ['require', 'underscore'], function (require, _) {
 
         _.each(mixins, function (mixinDefinition) {
             var mixinPath = mixinDefinition, _with = [], without = [], force = [];
-            console.log(mixinDefinition)
             if (_.isFunction(mixinDefinition)) {
-                //passing true causes the proxy from the Creator module to return the underlying object definition
-                mixinDefinition = mixinDefinition(true)
-            }
-            if (_.isObject(mixinDefinition)) {
+                doMixin(mixinDefinition, mixinPath, _with, without, force);
+            } else if (_.isObject(mixinDefinition)) {
                 mixinPath = mixinDefinition['name'];
                 if (!mixinPath) {
-                    // throw new Error("A Mixin specified as an object must have a name property");
-                    mixinPath = mixinDefinition.type ? mixinDefinition.type : 'unknown';
-                    //do mix in, treating mixinDefinition as the object to be mixed in
-                    doMixin(mixinDefinition, mixinPath, _with, without, force);
-                    return;
+                    throw new Error("A Mixin specified as an object must have a name property");
                 } else {
                     if (mixinDefinition['with']) {
                         _with = mixinDefinition['with'];
@@ -98,16 +109,18 @@ define('bkit/Mixin', ['require', 'underscore'], function (require, _) {
                     if (mixinDefinition['force']) {
                         force = mixinDefinition['force'];
                     }
-                    //intentionally not doing anything here, if mixin path is defined allow the else block to move on below
-                    //where a dynamic require is done treating mixin path  as a string path to the module to be mixed in
+                    //do a dynamic require if mixin definition is a string
+                    require([mixinPath], function (mixin) {
+                        doMixin(mixin, mixinPath, _with, without, force);
+                    });
                 }
+            } else {
+                throw new Error("A mixin must either be a function of an object capable of specifying how to get the required function")
             }
-            //do a dynamic require if mixin definition is a string
-            require([mixinPath], function (mixin) {
-                doMixin(mixin, mixinPath, _with, without, force);
-            });
         });
         //return the definition augmented with any mixin required
-        return definition;
+        //def.prototype = Mixin.prototype;
+
+        return Mixin;
     }
 });

@@ -3,8 +3,8 @@ define('bkit/dowi/Widget', ['require', 'jquery', 'signals', 'underscore', 'modul
         var type = module.id;
 
         function Widget() {
+            console.log(type+ ' constructor called');
             var $this = this;
-            $this.type = type;
             $this.template = null;
             $this.domNode = null;
             $this.s = {};
@@ -86,12 +86,7 @@ define('bkit/dowi/Widget', ['require', 'jquery', 'signals', 'underscore', 'modul
             })
         }
 
-        /**
-         * A set of constructors in the order their modules were mixed in.
-         * @type {Array}
-         */
-        Widget.prototype.constructors = [];
-
+        Widget.prototype.type = type;
         /**
          * Check if the given object is of the specified type.
          * An object is of a type if that type was mixed into the object
@@ -167,9 +162,9 @@ define('bkit/dowi/Widget', ['require', 'jquery', 'signals', 'underscore', 'modul
          * @returns the binding created from the signal being connected to the given slot
          */
         Widget.prototype.connect = function (signal, slot, once, priority, context) {
-            if (!this._(signal)) {
+            this._(signal).else(function () {
                 throw new Error(signal + " does not exist, cannot connect a slot to a non-existent signal.")
-            }
+            });
             var binding;
             //context should always be this or something it's mixed into
             context = context ? context : this;

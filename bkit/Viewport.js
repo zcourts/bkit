@@ -1,8 +1,8 @@
 define('bkit/Viewport', ['bkit/Mixin', 'bkit/dowi/Widget'], function (Mixin, Widget) {
-    var viewport = {
-        size: {}
-    };
-    viewport = Mixin([Widget], viewport);
+    function Viewport() {
+        this.size = {}
+    }
 
-    return viewport;
+    Viewport = Mixin([Widget], Viewport);
+    return Viewport;
 });
