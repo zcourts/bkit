@@ -1,15 +1,15 @@
 define('bkit/App',
     [
         'module',
-        'View/Mixin',
-        'View/dowi/Widget',
-        'View/dowi/Container',
+        'bkit/Mixin',
+        'bkit/dowi/Widget',
+        'bkit/dowi/Container',
         'hasher',
         'crossroads',
         'underscore'
     ], function (module, Mixin, Widget, Container, Hasher, Crossroads, _) {
         function App() {
-          //  console.log(Hasher, Crossroads, _);
+            //  console.log(Hasher, Crossroads, _);
         }
 
         App.prototype.addRoute = function (path, view) {

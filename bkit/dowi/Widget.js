@@ -119,8 +119,8 @@ define('bkit/dowi/Widget',
             if (obj && type) {
                 return obj && obj.mixins && obj.mixins[type]
             } else {
-                console.log(this, this.mixins);
-                return _.isFunction(obj) && this.mixins ? this.mixins[obj.type] : false;
+                return _.isFunction(obj) && this.mixins ? _.has(this.mixins, obj.type) :
+                    _.isString(obj) && this.mixins ? _.has(this.mixins, obj) : false;
             }
         };
 
