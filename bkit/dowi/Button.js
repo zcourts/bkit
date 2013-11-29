@@ -1,19 +1,23 @@
-define('bkit/dowi/Button', ['module', 'bkit/Mixin', 'text!bkit/dowi/tpl/Button.html', 'bkit/dowi/Widget',
-    'bkit/Creator'],
-    function (module, Mixin, template, Widget, Creator) {
+define('bkit/dowi/Button',
+    [
+        'module',
+        'bkit/Mixin',
+        'text!bkit/dowi/tpl/Button.html',
+        'bkit/dowi/Widget'
+    ],
+    function (module, Mixin, template, Widget) {
         function Button() {
-            this.type = module.id;
-            console.log('btn')
+            var $this = this;
+//            this.connect(this.s.setTemplate, function (template) {
+//                console.log('set template btn', template)
+//            });
+            //this.emit(this.s.setTemplate, template);
+            this._(this.s.setTemplate).then(function (signal) {
+                this.emit(signal, template);
+            })
         }
 
-//        Button.prototype.connect = function () {
-//            console.log('does nothing')
-//        };
-//        return Mixin([
-//            {
-//                name: 'bkit/dowi/Widget',
-//                force: ['connect'] //allow widget's connect to override the one defined here
-//            }
-//        ], Button);
+        Button.prototype.type = module.id;
+        window.Button = Button;
         return Mixin([Widget], Button);
     });

@@ -7,6 +7,8 @@ requirejs.config({
         jquery: 'jquery-2.0.3.min',
         signals: 'signals.min',
         underscore: 'underscore-min',
+        hasher: 'hasher.min',
+        crossroads: 'crossroads.min',
         app: '../app',
         //define BKit's base path relative to baseUrl
         bkit: '../../../bkit',
@@ -25,5 +27,4 @@ requirejs.config({
 
 requirejs(['app/index'],
     function (index) {
-        console.log(index)
     });

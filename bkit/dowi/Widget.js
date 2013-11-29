@@ -1,9 +1,15 @@
-define('bkit/dowi/Widget', ['require', 'jquery', 'signals', 'underscore', 'module'],
+define('bkit/dowi/Widget',
+    [
+        'require',
+        'jquery',
+        'signals',
+        'underscore',
+        'module'
+    ],
     function (require, $, Signal, _, module) {
         var type = module.id;
 
         function Widget() {
-            console.log(type+ ' constructor called');
             var $this = this;
             $this.template = null;
             $this.domNode = null;
@@ -59,7 +65,6 @@ define('bkit/dowi/Widget', ['require', 'jquery', 'signals', 'underscore', 'modul
                 $($this.domNode).on('keydown', function (e) {
                     $this.emit('keyDown', e)
                 });
-
             };
             //listen for events of interest
             var append = function (parent) {
@@ -83,7 +88,22 @@ define('bkit/dowi/Widget', ['require', 'jquery', 'signals', 'underscore', 'modul
                 $($this.domNode).hide(500, function () {
                     $($this.domNode).remove()
                 })
-            })
+            });
+
+            //generate a hash code for this instance
+            //http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
+            this.hash = 0;
+            var character, chars = new Date().getTime() + "" + Math.random(), len = chars.length;
+            for (var i = 0; i < len; i++) {
+                character = chars[i];
+                this.hash = ((this.hash << 5) - this.hash) + character;
+                this.hash |= 0; // Convert to 32bit integer
+            }
+            //NOTE: Widget's constructor is likely the first to be called so this event will be emitted before others
+            //have a chance to subscribe to it, but events are kept around for up to signal_linger_time after which
+            //they're removed. this means even though this is triggered before any subscriptions within that time
+            //will receive the event
+            this.emit('created');
         }
 
         Widget.prototype.type = type;
@@ -96,7 +116,12 @@ define('bkit/dowi/Widget', ['require', 'jquery', 'signals', 'underscore', 'modul
          * the given type
          */
         Widget.prototype.is = function (obj, type) {
-            return obj && obj.mixins && obj.mixins[type]
+            if (obj && type) {
+                return obj && obj.mixins && obj.mixins[type]
+            } else {
+                console.log(this, this.mixins);
+                return _.isFunction(obj) && this.mixins ? this.mixins[obj.type] : false;
+            }
         };
 
         /***
@@ -133,18 +158,30 @@ define('bkit/dowi/Widget', ['require', 'jquery', 'signals', 'underscore', 'modul
         /**
          * Provide a promise style response with a then and an else method.
          * If the given signal exists the then method is executed, if not the else method is executed
-         * @param signal the signal to check for
+         * @param signal the signal to check for. This can be a string which is the name of the signal or
+         * an object which will be treated as the signal to connect the slot to
+         *
+         *@return promise of with then and else methods. then is executed if the signal exists otherwise else is executed.
+         * The methods "then" and "else" available on the return object both invoke their callback with
+         * the widget's "this" as the context;
          */
         Widget.prototype._ = function (signal) {
-            var res = this.getSignal(signal);
-            return {
+            var res = signal;
+            if (_.isString(signal)) {
+                res = this.getSignal(signal);
+            }
+            var $this = this;
+            var o = {
                 then: function (callback) {
-                    res && callback ? callback.call(this, res) : false;
+                    res && callback ? callback.call($this, res) : false;
+                    return o;
                 },
                 else: function (callback) {
-                    !res && callback ? callback.call(this, false) : false;
+                    !res && callback ? callback.call($this, false) : false;
+                    return o;
                 }
             };
+            return o;
         };
 
         Widget.prototype.respondsTo = function (signal) {
@@ -153,7 +190,8 @@ define('bkit/dowi/Widget', ['require', 'jquery', 'signals', 'underscore', 'modul
 
         /**
          * Connect a signal to a slot, enabling that slot to be notified when the signal is emitted
-         * @param signal the signal to connect to the slot
+         * @param signal the signal to connect to the slot. This can be a string which is the name of the signal or
+         * an object which will be treated as the signal to connect the slot to
          * @param slot the slot to which the signal should be connected
          * @param once if truthful then the signal is only notified of the event once
          * @param priority determines the order in which the slot is notified of the event against other slots
@@ -162,17 +200,20 @@ define('bkit/dowi/Widget', ['require', 'jquery', 'signals', 'underscore', 'modul
          * @returns the binding created from the signal being connected to the given slot
          */
         Widget.prototype.connect = function (signal, slot, once, priority, context) {
-            this._(signal).else(function () {
-                throw new Error(signal + " does not exist, cannot connect a slot to a non-existent signal.")
-            });
-            var binding;
             //context should always be this or something it's mixed into
             context = context ? context : this;
-            if (once) {
-                binding = this.s[signal].addOnce(slot, context, priority);
-            } else {
-                binding = this.s[signal].add(slot, context, priority);
-            }
+            var binding;
+            this._(signal)
+                .then(function (signal) {
+                    if (once) {
+                        binding = signal.addOnce(slot, context, priority);
+                    } else {
+                        binding = signal.add(slot, context, priority);
+                    }
+                })
+                .else(function () {
+                    throw new Error(signal + " does not exist, cannot connect a slot to a non-existent signal.")
+                });
             return binding;
         };
         /**
@@ -182,15 +223,26 @@ define('bkit/dowi/Widget', ['require', 'jquery', 'signals', 'underscore', 'modul
          * @param params* one or more parameters to be passed as the signal's arguments
          */
         Widget.prototype.emit = function (signal, params) {
-            params = _.toArray(arguments).slice(1);
-            if (!this.s[signal]) {
-                throw new Error("Attempting to emit an unknown signal " + signal);
-            }
-            this.s[signal].dispatch.apply(this, params);
             var $widget = this;
-            setTimeout(function () {
-                $widget.signals[signal].forget();
-            }, this.signal_linger_time)
+            params = _.toArray(arguments).slice(1);
+            this._(signal)
+                .then(function (s) {
+                    s.dispatch.apply(this, params);
+                    setTimeout(function () {
+                        s.forget();
+                    }, $widget.signal_linger_time)
+                })
+                .else(function () {
+                    throw new Error("Attempting to emit an unknown signal " + signal);
+                });
+        };
+
+        Widget.prototype.hashCode = function () {
+            return this.hash;
+        };
+
+        Widget.prototype.toString = function () {
+            return JSON.stringify(this);
         };
 
         return Widget;

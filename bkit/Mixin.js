@@ -39,8 +39,11 @@ define('bkit/Mixin', ['require', 'underscore'], function (require, _) {
         }
 
         Mixin.prototype.constructors = def.prototype.constructors ? def.prototype.constructors : [];
-        Mixin.prototype.constructor.name = def.constructor.name;
         Mixin.prototype.mixins = {};
+
+        if (def.prototype.type) {
+            Mixin.prototype.mixins[def.prototype.type] = def;
+        }
 
         Mixin.prototype.isMixin = function () {
             return true;
@@ -49,6 +52,7 @@ define('bkit/Mixin', ['require', 'underscore'], function (require, _) {
         _.each(def.prototype, function (value, name) {
             Mixin.prototype[name] = value;
         });
+
         function doMixin(mixin, mixinPath, _with, without, force) {
             mixinPath = mixin.prototype.type ? mixin.prototype.type : _.isString(mixinPath) ? mixinPath : 'unknown';
             Mixin.prototype.constructors.push(mixin);
@@ -73,16 +77,13 @@ define('bkit/Mixin', ['require', 'underscore'], function (require, _) {
                         //definition[name].definition = mixin;
                     }
                 } else {
-                    console.log('mixing 4', name);
                     //if the name is already defined it should be over written if and only if
                     //definition[name].defined_by is present AND force contains name
                     if (force.length > 0
                         //&& definition.prototype[name].defined_by //only override properties defined through mixins?
                         && _.indexOf(force, name) != -1) {
-                        console.log('mixing 5', name);
                         Mixin.prototype[name] = value;
                         if (Mixin.prototype[name]) {
-                            console.log('mixing 6', name);
                             Mixin.prototype[name].defined_by = mixinPath;
                             //definition[name].definition = mixin;
                         }
@@ -119,8 +120,6 @@ define('bkit/Mixin', ['require', 'underscore'], function (require, _) {
             }
         });
         //return the definition augmented with any mixin required
-        //def.prototype = Mixin.prototype;
-
         return Mixin;
     }
 });
