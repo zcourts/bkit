@@ -21,6 +21,7 @@ define('bkit/App',
             this.view = null;
             this.$('_route');//create set route event
             this.$('route');
+            this.$('route_missing');
             this._(this.s.setDomNode).then(function (signal) {
                 this.emit(signal, $(container)[0]);
             });
@@ -31,13 +32,23 @@ define('bkit/App',
          */
         App.prototype.startRouting = function () {
             hasher.init();
+            //add by passed listener before listening for route events
+            crossroads.bypassed.add(function (path) {
+                if (this.notFound) {
+                    this.switchView(this.notFound, path);
+                }
+                this.emit(this.s.route_missing, path);
+            }, this);
+
             hasher.initialized.add(function (val, oldVal) {
                 crossroads.parse(val);
             }, this);
+
             this.connect(this.s._route, function (val) {
                 //match paths and generate history
                 crossroads.parse(val);
             });
+
             hasher.changed.add(this.setRoute, this); //listen for all future changes
         };
 
