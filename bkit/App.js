@@ -32,6 +32,9 @@ define('bkit/App',
          */
         App.prototype.startRouting = function () {
             hasher.init();
+            //http://millermedeiros.github.io/crossroads.js/#crossroads-greedy
+            crossroads.greedy = true;
+            crossroads.greedyEnabled = true;
             //add by passed listener before listening for route events
             crossroads.bypassed.add(function (path) {
                 if (this.notFound) {
