@@ -45,12 +45,27 @@ define('bkit/Mixin', ['require', 'underscore'], function (require, _) {
             Mixin.prototype.mixins[def.prototype.type] = def;
         }
 
-        Mixin.prototype.isMixin = function () {
-            return true;
-        };
+        Mixin.prototype.isMixin = true;
+
+        function trace(name, value, path) {
+            if (window.bkit_trace) {
+                Mixin.prototype[name] = function () {
+                    console.log('TRACE:', name, arguments,
+                        _.isFunction(path) ? '' : path,
+                        console.trace ? console.trace() : '');
+                    if (value) {
+                        return value.apply(this, arguments);
+                    }
+                    return undefined;
+                }
+            } else {
+                Mixin.prototype[name] = value;
+            }
+        }
+
         //copy all properties from the definitions prototype to the proxy's
         _.each(def.prototype, function (value, name) {
-            Mixin.prototype[name] = value;
+            trace(name, value, def.prototype.type);
         });
 
         function doMixin(mixin, mixinPath, _with, without, force) {
@@ -71,7 +86,8 @@ define('bkit/Mixin', ['require', 'underscore'], function (require, _) {
 
                 //if this property isn't already defined then add it
                 if (!Mixin.prototype[name]) {
-                    Mixin.prototype[name] = value;
+                    //Mixin.prototype[name] = value;
+                    trace(name, value, mixinPath);
                     if (Mixin[name]) {
                         Mixin[name].defined_by = mixinPath;
                         //definition[name].definition = mixin;
@@ -82,7 +98,8 @@ define('bkit/Mixin', ['require', 'underscore'], function (require, _) {
                     if (force.length > 0
                         //&& definition.prototype[name].defined_by //only override properties defined through mixins?
                         && _.indexOf(force, name) != -1) {
-                        Mixin.prototype[name] = value;
+                        //Mixin.prototype[name] = value;
+                        trace(name, value, mixinPath);
                         if (Mixin.prototype[name]) {
                             Mixin.prototype[name].defined_by = mixinPath;
                             //definition[name].definition = mixin;

@@ -4,35 +4,36 @@ define('bkit/dowi/Widget',
         'jquery',
         'signals',
         'underscore',
-        'module'
+        'module'                                   ,
+        'bkit/Promise',
+        'bkit/Util'
     ],
-    function (require, $, Signal, _, module) {
-        var type = module.id;
-
+    function (require, $, Signal, _, module, Promise, Util) {
         function Widget() {
             var $this = this;
-            $this.template = null;
-            $this.domNode = null;
-            $this.s = {};
-            $this.signal_linger_time = 30000;
+            this.template = null;
+            this.domNode = null;
+            this.s = {};
+            this.signal_linger_time = 30000;
             //setup signals that all widgets should be able to handle
-            $this.$('created');
-            $this.$('destroyed');
-            $this.$('prepended');
-            $this.$('rendered');
-            $this.$('appended');
-            $this.$('setTemplate');
-            $this.$('leftClicked');
-            $this.$('middleClicked');
-            $this.$('rightClicked');
-            $this.$('doubleClicked');
-            $this.$('mouseEntered');
-            $this.$('mouseLeft');
-            $this.$('mouseMoved');
-            $this.$('keyDown');
-            $this.$('keyUp');
+            this.$('created');
+            this.$('destroyed');
+            this.$('prepended');
+            this.$('rendered');
+            this.$('appended');
+            this.$('setTemplate');
+            this.$('setDomNode');
+            this.$('leftClicked');
+            this.$('middleClicked');
+            this.$('rightClicked');
+            this.$('doubleClicked');
+            this.$('mouseEntered');
+            this.$('mouseLeft');
+            this.$('mouseMoved');
+            this.$('keyDown');
+            this.$('keyUp');
             var addDomListeners = function () {
-                $($this.domNode).mousedown(function (e) {
+                $this.domNode.mousedown(function (e) {
                     switch (e.which) {
                         case 1:
                             $this.emit('leftClicked', e);
@@ -47,58 +48,64 @@ define('bkit/dowi/Widget',
                             console.log('Unknown pointing device...');
                     }
                 });
-                $($this.domNode).on('dblclick', function (e) {
+                $this.domNode.on('dblclick', function (e) {
                     $this.emit('doubleClicked', e)
                 });
-                $($this.domNode).on('mouseenter', function (e) {
+                $this.domNode.on('mouseenter', function (e) {
                     $this.emit('mouseEntered', e)
                 });
-                $($this.domNode).on('mouseleave', function (e) {
+                $this.domNode.on('mouseleave', function (e) {
                     $this.emit('mouseLeft', e)
                 });
-                $($this.domNode).on('mousemove', function (e) {
+                $this.domNode.on('mousemove', function (e) {
                     $this.emit('mouseMoved', e)
                 });
-                $($this.domNode).on('keyup', function (e) {
+                $this.domNode.on('keyup', function (e) {
                     $this.emit('keyUp', e)
                 });
-                $($this.domNode).on('keydown', function (e) {
+                $this.domNode.on('keydown', function (e) {
                     $this.emit('keyDown', e)
                 });
             };
             //listen for events of interest
             var append = function (parent) {
-                $(parent.domNode).append($this.domNode)
+                parent.domNode.append($this.domNode)
             };
-            $this.connect('setTemplate', function (template) {
+            this.connect('setTemplate', function (template) {
                 $this.template = template;
-                $this.domNode = $.parseHTML(template);
+                $this.emit($this.s.setDomNode);
+            });
+            this.connect('setDomNode', function (node) {
+                if (node) {
+                    $this.domNode = $(node);
+                } else if ($this.template) {
+                    $this.domNode = $($.parseHTML($this.template));
+                }
                 addDomListeners();
             });
-            $this.connect('rendered', append);
-            $this.connect('appended', append);
-            $this.connect('prepended', function (parent) {
+            this.connect('rendered', append);
+            this.connect('appended', append);
+            this.connect('prepended', function (parent) {
                 $(parent.domNode).prepend($this.domNode);
             });
 
-            $this.connect('created', function () {
+            this.connect('created', function () {
                 //todo
             });
-            $this.connect('destroyed', function () {
-                $($this.domNode).hide(500, function () {
-                    $($this.domNode).remove()
+            this.connect('destroyed', function () {
+                $this.domNode.hide(500, function () {
+                    $this.domNode.remove()
                 })
             });
 
-            //generate a hash code for this instance
-            //http://werxltd.com/wp/2010/05/13/javascript-implementation-of-javas-string-hashcode-method/
-            this.hash = 0;
-            var character, chars = new Date().getTime() + "" + Math.random(), len = chars.length;
-            for (var i = 0; i < len; i++) {
-                character = chars[i];
-                this.hash = ((this.hash << 5) - this.hash) + character;
-                this.hash |= 0; // Convert to 32bit integer
-            }
+            //generate the hash code for this widget
+            var allMixinNames = "";
+            _.each(this.mixins, function (val, key) {
+                allMixinNames += key;
+            });
+            this.hashCode = Util.hash(allMixinNames);
+            //and the instance id
+            this.instance_id = Util.hash(new Date().getTime() + "" + Math.random());
             //NOTE: Widget's constructor is likely the first to be called so this event will be emitted before others
             //have a chance to subscribe to it, but events are kept around for up to signal_linger_time after which
             //they're removed. this means even though this is triggered before any subscriptions within that time
@@ -106,7 +113,8 @@ define('bkit/dowi/Widget',
             this.emit('created');
         }
 
-        Widget.prototype.type = type;
+        Widget.prototype.type = module.id;
+
         /**
          * Check if the given object is of the specified type.
          * An object is of a type if that type was mixed into the object
@@ -129,9 +137,7 @@ define('bkit/dowi/Widget',
          * @param obj the object to check
          * @returns true if Widget was mixed into the object
          */
-        Widget.prototype.isWidget = function (obj) {
-            return this.is(obj, type)
-        };
+        Widget.prototype.isWidget = true;
 
         /**
          * Create a signal with the given name on this widget and add it to the list of the widget's signals
@@ -161,7 +167,7 @@ define('bkit/dowi/Widget',
          * @param signal the signal to check for. This can be a string which is the name of the signal or
          * an object which will be treated as the signal to connect the slot to
          *
-         *@return promise of with then and else methods. then is executed if the signal exists otherwise else is executed.
+         *@return {Promise}  with then and else methods. then is executed if the signal exists otherwise else is executed.
          * The methods "then" and "else" available on the return object both invoke their callback with
          * the widget's "this" as the context;
          */
@@ -170,18 +176,7 @@ define('bkit/dowi/Widget',
             if (_.isString(signal)) {
                 res = this.getSignal(signal);
             }
-            var $this = this;
-            var o = {
-                then: function (callback) {
-                    res && callback ? callback.call($this, res) : false;
-                    return o;
-                },
-                else: function (callback) {
-                    !res && callback ? callback.call($this, false) : false;
-                    return o;
-                }
-            };
-            return o;
+            return new Promise(res, this, res);
         };
 
         Widget.prototype.respondsTo = function (signal) {
@@ -237,8 +232,22 @@ define('bkit/dowi/Widget',
                 });
         };
 
-        Widget.prototype.hashCode = function () {
-            return this.hash;
+        /**
+         * Every Mixin gets a unique hash code. This hash code is the same for all instances of that Mixin
+         * To get a hash per instance use the this.instanceId() method
+         * @returns {int} The hash code for this widget
+         */
+        Widget.prototype.hash = function () {
+            return this.hashCode;
+        };
+
+        /**
+         * Every instance of a widget receives an ID separate to the widget's hash code
+         * which is the same for all instances of the same widget
+         * @returns {int} the ID for this instance
+         */
+        Widget.prototype.instanceId = function () {
+            return this.instance_id;
         };
 
         Widget.prototype.toString = function () {

@@ -6,15 +6,19 @@ define('bkit/dowi/Button',
         'bkit/dowi/Widget'
     ],
     function (module, Mixin, template, Widget) {
-        function Button() {
+        function Button(args) {
             var $this = this;
-//            this.connect(this.s.setTemplate, function (template) {
-//                console.log('set template btn', template)
-//            });
-            //this.emit(this.s.setTemplate, template);
             this._(this.s.setTemplate).then(function (signal) {
                 this.emit(signal, template);
-            })
+            });
+            this.connect(this.s.setDomNode, function () {
+                if (args.attr) {
+                    this.domNode.attr(args.attr);
+                    if (args.attr.text) {
+                        this.domNode.text(args.attr.text)
+                    }
+                }
+            });
         }
 
         Button.prototype.type = module.id;
