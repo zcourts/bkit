@@ -1,0 +1,24 @@
+{
+    "name": "bkit",
+    "version": "0.0.1",
+    "description": "Toolkit",
+    "main": "server.js",
+    "keywords": [],
+    "dependencies": {
+        "express": ""
+    },
+    "devDependencies": {},
+    "readmeFilename": "README.md",
+    "directories": {
+        "test": "tests"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/zcourts/bkit.git"
+    },
+    "author": "Courtney Robinson",
+    "license": "Apache v2"
+}
