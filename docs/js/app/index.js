@@ -1,6 +1,6 @@
 define(
     [
-        'bkit/Application'
+        'bkit/App'
     ],
     function (App) {
         console.log(new App())

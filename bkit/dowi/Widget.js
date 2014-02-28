@@ -15,94 +15,13 @@ define('bkit/dowi/Widget',
             this.domNode = null;
             this.s = {};
             this.signal_linger_time = 30000;
-            //setup signals that all widgets should be able to handle
-            this.$('created');
-            this.$('destroyed');
-            this.$('prepended');
-            this.$('rendered');
-            this.$('appended');
-            this.$('setTemplate');
-            this.$('setDomNode');
-            this.$('leftClicked');
-            this.$('middleClicked');
-            this.$('rightClicked');
-            this.$('doubleClicked');
-            this.$('mouseEntered');
-            this.$('mouseLeft');
-            this.$('mouseMoved');
-            this.$('keyDown');
-            this.$('keyUp');
-            var addDomListeners = function () {
-                $this.domNode.mousedown(function (e) {
-                    switch (e.which) {
-                        case 1:
-                            $this.emit('leftClicked', e);
-                            break;
-                        case 2:
-                            $this.emit('middleClicked', e);
-                            break;
-                        case 3:
-                            $this.emit('rightClicked', e);
-                            break;
-                        default:
-                            console.log('Unknown pointing device...');
-                    }
-                });
-                $this.domNode.on('dblclick', function (e) {
-                    $this.emit('doubleClicked', e)
-                });
-                $this.domNode.on('mouseenter', function (e) {
-                    $this.emit('mouseEntered', e)
-                });
-                $this.domNode.on('mouseleave', function (e) {
-                    $this.emit('mouseLeft', e)
-                });
-                $this.domNode.on('mousemove', function (e) {
-                    $this.emit('mouseMoved', e)
-                });
-                $this.domNode.on('keyup', function (e) {
-                    $this.emit('keyUp', e)
-                });
-                $this.domNode.on('keydown', function (e) {
-                    $this.emit('keyDown', e)
-                });
-            };
-            //listen for events of interest
-            var append = function (parent) {
-                parent.domNode.append($this.domNode)
-            };
-            this.connect('setTemplate', function (template) {
-                $this.template = template;
-                $this.emit($this.s.setDomNode);
-            });
-            this.connect('setDomNode', function (node) {
-                if (node) {
-                    $this.domNode = $(node);
-                } else if ($this.template) {
-                    $this.domNode = $($.parseHTML($this.template));
-                }
-                addDomListeners();
-            });
-            this.connect('rendered', append);
-            this.connect('appended', append);
-            this.connect('prepended', function (parent) {
-                $(parent.domNode).prepend($this.domNode);
-            });
-
-            this.connect('created', function () {
-                //todo
-            });
-            this.connect('destroyed', function () {
-                $this.domNode.hide(500, function () {
-                    $this.domNode.remove()
-                })
-            });
 
             //generate the hash code for this widget
             var allMixinNames = "";
             _.each(this.mixins, function (val, key) {
                 allMixinNames += key;
             });
+
             this.hashCode = Util.hash(allMixinNames);
             //and the instance id
             this.instance_id = Util.hash(new Date().getTime() + "" + Math.random());
