@@ -13,6 +13,7 @@ define('bkit/dowi/Container',
         }
 
         Container.prototype.type = module.id;
+        Container.prototype.namespace = 'bkit';
 
         /**
          * Adds a child to this container.

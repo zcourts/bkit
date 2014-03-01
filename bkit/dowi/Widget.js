@@ -18,22 +18,26 @@ define('bkit/dowi/Widget',
 
             //generate the hash code for this widget
             var allMixinNames = "";
-            _.each(this.mixins, function (val, key) {
-                allMixinNames += key;
-            });
+//            _.each(this.mixins, function (val, key) {
+//                allMixinNames += key;
+//            });
 
-            this.hashCode = Util.hash(allMixinNames);
+//            this.hashCode = Util.hash(allMixinNames);
             //and the instance id
-            this.instance_id = Util.hash(new Date().getTime() + "" + Math.random());
+//            this.instance_id = Util.hash(new Date().getTime() + "" + Math.random());
             //NOTE: Widget's constructor is likely the first to be called so this event will be emitted before others
             //have a chance to subscribe to it, but events are kept around for up to signal_linger_time after which
             //they're removed. this means even though this is triggered before any subscriptions within that time
             //will receive the event
             //this.emit('created');
+            console.log(this);
         }
 
         Widget.prototype.type = module.id;
         Widget.prototype.namespace = 'bkit';
+        Widget.prototype.init = function () {
+            console.log('widget init')
+        };
         /**
          * Check if the given object is of the specified type.
          * An object is of a type if that type was mixed into the object
@@ -46,6 +50,7 @@ define('bkit/dowi/Widget',
             if (obj && type) {
                 return obj && obj.mixins && obj.mixins[type]
             } else {
+                console.log(this)
                 return _.isFunction(obj) && this.mixins ? _.has(this.mixins, obj.type) :
                     _.isString(obj) && this.mixins ? _.has(this.mixins, obj) : false;
             }
@@ -170,6 +175,7 @@ define('bkit/dowi/Widget',
         };
 
         Widget.prototype.toString = function () {
+            //console.log(this)
             return JSON.stringify(this);
         };
 

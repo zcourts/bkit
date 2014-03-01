@@ -12,7 +12,8 @@ define('bkit/dowi/Button',
         }
 
         Button.prototype.setlabel = function (l) {
-            this.options.label = l;
+            //console.log(this)
+            //this.options.label = l;
         };
 
         Button.prototype.type = module.id;
