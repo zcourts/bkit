@@ -1,8 +1,7 @@
-define('bkit/Mixin', ['require', 'underscore'], function (require, _) {
+define('bkit/Mixin', ['require', 'underscore', 'jquery'], function (require, _, $) {
     /**
      * Define a Mixin using the AMD API with an extra argument before the callback function.
      * For every Mixin created
-     * @param name The name of the component being defined.
      * @param deps An array of dependencies
      * @param mixins  This extra argument is an array of strings and objects.
      *
@@ -68,10 +67,37 @@ define('bkit/Mixin', ['require', 'underscore'], function (require, _) {
             trace(name, value, def.prototype.type);
         });
 
+        function Namespace() {
+        }
+
+        /**
+         * Gets the function prototype to which a widget's functions should be added
+         * @param fn the function whose namespace should be fetched
+         * @param strName a valid namespace - a simple string such as 'touch' our 'user.touch'.
+         * A dot separated namespace causes any non-existent parent to be created.
+         * @returns {Object|Function|*}
+         */
+        function getNamespace(fn, strName) {
+            var packages = strName.split('.'), namespace = fn.prototype;
+            for (var i in packages) {
+                if (packages.hasOwnProperty(i)) {
+                    var name = packages[i];
+                    if (name && name != '') {
+                        if (!namespace[name]) {
+                            namespace[name] = {};
+                        }
+                        namespace = namespace[name];
+                    }
+                }
+            }
+            return namespace;
+        }
+
         function doMixin(mixin, mixinPath, _with, without, force) {
             mixinPath = mixin.prototype.type ? mixin.prototype.type : _.isString(mixinPath) ? mixinPath : 'unknown';
             Mixin.prototype.constructors.push(mixin);
             Mixin.prototype.mixins[mixinPath] = mixin;
+            console.log(new mixin())
             _.each(mixin.prototype, function (value, name) {
                 //if with is specified then only names in the _with array are allowed to be mixed in
                 //so if name isn't found then return without doing anything
@@ -112,7 +138,12 @@ define('bkit/Mixin', ['require', 'underscore'], function (require, _) {
         _.each(mixins, function (mixinDefinition) {
             var mixinPath = mixinDefinition, _with = [], without = [], force = [];
             if (_.isFunction(mixinDefinition)) {
-                doMixin(mixinDefinition, mixinPath, _with, without, force);
+                if (_.isString(mixinDefinition.prototype.namespace)) {
+                    doMixin(mixinDefinition, mixinPath, _with, without, force);
+                } else {
+                    throw new Error("All Mixins must have a namespace. On => " +
+                        mixinDefinition.prototype.type + " definition => " + mixinDefinition);
+                }
             } else if (_.isObject(mixinDefinition)) {
                 mixinPath = mixinDefinition['name'];
                 if (!mixinPath) {
@@ -129,7 +160,12 @@ define('bkit/Mixin', ['require', 'underscore'], function (require, _) {
                     }
                     //do a dynamic require if mixin definition is a string
                     require([mixinPath], function (mixin) {
-                        doMixin(mixin, mixinPath, _with, without, force);
+                        if (_.isString(mixin.prototype.namespace)) {
+                            doMixin(mixin, mixinPath, _with, without, force);
+                        } else {
+                            throw new Error("All Mixins must have a namespace. On => " +
+                                mixinPath + " definition => " + mixinDefinition);
+                        }
                     });
                 }
             } else {

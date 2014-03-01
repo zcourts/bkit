@@ -1,7 +1,13 @@
 define(
     [
-        'bkit/App'
+        'bkit/App',
+        'bkit/dowi/Button'
     ],
-    function (App) {
-        console.log(new App())
+    function (App, Button) {
+        console.log(new App());
+        var a = new Button(), b = new Button();
+        console.log(a, b);
+        a.setlabel('a');
+        b.setlabel('b');
+        console.log(a, b);
     });

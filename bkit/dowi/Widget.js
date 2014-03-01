@@ -29,11 +29,11 @@ define('bkit/dowi/Widget',
             //have a chance to subscribe to it, but events are kept around for up to signal_linger_time after which
             //they're removed. this means even though this is triggered before any subscriptions within that time
             //will receive the event
-            this.emit('created');
+            //this.emit('created');
         }
 
         Widget.prototype.type = module.id;
-
+        Widget.prototype.namespace = 'bkit';
         /**
          * Check if the given object is of the specified type.
          * An object is of a type if that type was mixed into the object

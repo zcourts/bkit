@@ -58,6 +58,68 @@ This means that the data properties of Button should not have any names directly
 To that end, all properties set with Button.set is placed under the field "fields".
 All standard widgets in BKit use the Widget.attr.set and Widget.attr.get functions where attr is the namespace for Settable.
 
+### Multi-level namespaces
+Multi-level namespaces would be nice if supported. A Widget can define it's name space as 'user.touch' and the Mixin will create
+the user namespace if it doesn't exist and add touch to it. Any functions defined by a widget is then available under the
+user.touch namespace. Unfortunately, this isn't as trivial as it might sound take for example
+
+```javascript
+
+        function Namespace() {
+        }
+
+        /**
+         * Gets the function prototype to which a widget's functions should be added
+         * @param fn the function whose namespace should be fetched
+         * @param strName a valid namespace - a simple string such as 'touch' our 'user.touch'.
+         * A dot separated namespace causes any non-existent parent to be created.
+         * @returns {Object|Function|*}
+         */
+        function getNamespace(fn, strName) {
+            var packages = strName.split('.'), namespace = fn.prototype;
+            for (var i in packages) {
+                if (packages.hasOwnProperty(i)) {
+                    var name = packages[i];
+                    if (name && name != '') {
+                        if (!namespace[name]) {
+                            namespace[name] = {};
+                        }
+                        namespace = namespace[name];
+                    }
+                }
+            }
+            return namespace;
+        }
+
+        function A() {
+        }
+
+        //A.prototype.a = {123: 12345};
+        //console.log(A.prototype);
+        var namespace = getNamespace(A, 'a.b.c');
+        console.log(namespace);
+        namespace.hello = function (arg) {
+            this.arg = arg;
+            console.log(this);
+            //console.log('say hello world bitches => ' + arg);
+        };
+        a = new A();
+        b = new A();
+        a.a.b.c.hello.call(b, 'b');
+        a.a.b.c.hello('b proto');
+        a.a.b.c.hello.call(a, 'a');
+        a.a.b.c.hello('a proto');
+        //b.a.b.c.hello('from b');
+        //console.log(a, b);
+
+```
+
+Anything added to fn.prototype is shared between all objects created from A(). So modifying this.arg on a or b
+results in the value being set on both a and b.
+Rarely if ever is this the desired effect. Need a way around it before multi-level namespaces can be supported but this
+is good to keep in mind for a TODO perhaps in version 2...where widgets might return factories that return objects
+so a mixin can happen on the object i.e. not using .prototype which would enable multi-level namespaces to work.
+
 ## 10K ft design
 
 BKit is designed to work the way a typical application does. At least in terms of how it is structured.

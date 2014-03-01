@@ -8,8 +8,8 @@ define('bkit/dowi/Container',
     function (module, _, Mixin, Widget) {
         function Container() {
             this.children = {};
-            this.connect(this.s.destroyed, this.destroy);
-            this.connect(this.s.setDomNode, this.setDomNode);
+            //this.connect(this.s.destroyed, this.destroy);
+            //this.connect(this.s.setDomNode, this.setDomNode);
         }
 
         Container.prototype.type = module.id;
