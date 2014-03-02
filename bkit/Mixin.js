@@ -1,6 +1,5 @@
 define('bkit/Mixin', ['require', 'underscore', 'jquery'], function (require, _, $) {
     return   function (mixins, MixinWidget) {
-
         MixinWidget.prototype.inits = MixinWidget.prototype.inits || [];
         MixinWidget.prototype.mixins = MixinWidget.prototype.mixins || {};
 
@@ -8,9 +7,9 @@ define('bkit/Mixin', ['require', 'underscore', 'jquery'], function (require, _, 
             MixinWidget.prototype.mixins[MixinWidget.prototype.type] = MixinWidget;
         }
         MixinWidget.prototype.isMixin = true;
+        var sharedState = {};
 
         function Namespace() {
-            console.log('namespace')
         }
 
         /**
@@ -25,7 +24,7 @@ define('bkit/Mixin', ['require', 'underscore', 'jquery'], function (require, _, 
             _.each(strName.split('.'), function (value) {
                 if (value && value != '') {
                     if (!namespace[value]) {
-                        namespace[value] = Namespace.prototype;
+                        namespace[value] = new Namespace();
                     }
                     namespace = namespace[value];
                 }
@@ -36,6 +35,7 @@ define('bkit/Mixin', ['require', 'underscore', 'jquery'], function (require, _, 
         function doMixin(mixin) {
             if (mixin.prototype.init) {
                 MixinWidget.prototype.inits.push(mixin);
+                MixinWidget.prototype.inits.push(mixin.prototype.init);
             }
             MixinWidget.prototype.mixins[mixin.prototype.type] = mixin;
             var proto = getNamespace(MixinWidget, mixin.prototype.namespace);
@@ -57,6 +57,32 @@ define('bkit/Mixin', ['require', 'underscore', 'jquery'], function (require, _, 
                 throw new Error("A mixin must either be a function of an object capable of specifying how to get the required function")
             }
         });
+        var visited = [];
+
+        function doBind(instance) {
+            for (var i in instance) {
+                if (_.isFunction(instance[i])) {
+                    instance[i] = instance[i].bind(instance);
+                }
+                if (_.indexOf(visited, instance[i]) == -1) {
+                    visited.push(instance[i]);
+                    doBind(instance[i]);
+                }
+            }
+        }
+
+        MixinWidget.create = function (options) {
+            var instance = MixinWidget.bind({}, options);
+            //doBind(instance);
+            for (var i in instance.inits) {
+                instance.inits[i].call(instance, options);
+            }
+            return instance;
+        };
+
+        //add the init of the widget being mixed last
+        MixinWidget.prototype.inits.push(MixinWidget);
+        MixinWidget.prototype.inits.push(MixinWidget.prototype.init);
         //return the definition augmented with any mixin required
         return MixinWidget;
     }

@@ -10,7 +10,12 @@ define('bkit/dowi/Widget',
     ],
     function (require, $, Signal, _, module, Promise, Util) {
         function Widget() {
-            var $this = this;
+            console.log(this);
+        }
+
+        Widget.prototype.type = module.id;
+        Widget.prototype.namespace = 'bkit';
+        Widget.prototype.init = function () {
             this.template = null;
             this.domNode = null;
             this.s = {};
@@ -31,12 +36,6 @@ define('bkit/dowi/Widget',
             //will receive the event
             //this.emit('created');
             console.log(this);
-        }
-
-        Widget.prototype.type = module.id;
-        Widget.prototype.namespace = 'bkit';
-        Widget.prototype.init = function () {
-            console.log('widget init')
         };
         /**
          * Check if the given object is of the specified type.

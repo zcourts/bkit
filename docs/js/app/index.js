@@ -5,10 +5,11 @@ define(
     ],
     function (App, Button) {
         //console.log(new App());
-        a = new Button(), b = new Button();
+        a = Button.create({});
+//        b = Button.create({});
         //console.log(a, b);
         a.setlabel('a');
-        b.setlabel('b');
+//        b.setlabel('b');
 //        console.log(a, b);
 
     });
