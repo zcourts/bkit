@@ -7,22 +7,14 @@ define('bkit/dowi/Button',
     ],
     function (module, Mixin, template, Widget) {
         function Button(options) {
-            console.log(this);
         }
 
-        Button.prototype.init = function (options) {
-            console.log(this);
-            this.options = options || {};
-            this.options.label = 'Button';
-            //console.log(this.signal_linger_time, this);
-        };
-
-        Button.prototype.setlabel = function (l) {
-            //console.log(this)
-            //this.options.label = l;
-        };
-
         Button.prototype.type = module.id;
-        window.Button = Button;
+        Button.prototype.namespace = 'bkit';
+        Button.prototype.defaults = {label: 'Button'};
+
+        Button.prototype.init = function (self) {
+        };
+
         return Mixin([Widget], Button);
     });

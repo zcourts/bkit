@@ -12,8 +12,9 @@ define('bkit/App',
         'bkit/Promise',
         'bkit/Util'
     ], function (module, hasher, crossroads, _, $, Mixin, View, Widget, Container, Promise, Util) {
-        var data = arguments;
-        return  function App() {
-            this.data = data;
+        function App() {
         }
+
+        App.prototype.namespace = 'bkit';
+        App.prototype.type = module.id;
     });

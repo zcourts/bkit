@@ -10,32 +10,26 @@ define('bkit/dowi/Widget',
     ],
     function (require, $, Signal, _, module, Promise, Util) {
         function Widget() {
-            console.log(this);
         }
 
         Widget.prototype.type = module.id;
         Widget.prototype.namespace = 'bkit';
-        Widget.prototype.init = function () {
-            this.template = null;
-            this.domNode = null;
-            this.s = {};
-            this.signal_linger_time = 30000;
+        Widget.prototype.defaults = {signal_linger_time: 30000};
+
+        Widget.prototype.init = function (self) {
+            self.template = null;
+            self.domNode = null;
+            self.s = {};
 
             //generate the hash code for this widget
             var allMixinNames = "";
-//            _.each(this.mixins, function (val, key) {
-//                allMixinNames += key;
-//            });
+            _.each(self.mixins, function (self, val, key) {
+                allMixinNames += key;
+            });
 
-//            this.hashCode = Util.hash(allMixinNames);
+            self.hashCode = Util.hash(allMixinNames);
             //and the instance id
-//            this.instance_id = Util.hash(new Date().getTime() + "" + Math.random());
-            //NOTE: Widget's constructor is likely the first to be called so this event will be emitted before others
-            //have a chance to subscribe to it, but events are kept around for up to signal_linger_time after which
-            //they're removed. this means even though this is triggered before any subscriptions within that time
-            //will receive the event
-            //this.emit('created');
-            console.log(this);
+            self.instance_id = Util.hash(new Date().getTime() + "" + Math.random());
         };
         /**
          * Check if the given object is of the specified type.
@@ -45,13 +39,12 @@ define('bkit/dowi/Widget',
          * @returns true if the object is truthful, has a mixins property and that mixin property contains a key of
          * the given type
          */
-        Widget.prototype.is = function (obj, type) {
+        Widget.prototype.is = function (self, obj, type) {
             if (obj && type) {
                 return obj && obj.mixins && obj.mixins[type]
             } else {
-                console.log(this)
-                return _.isFunction(obj) && this.mixins ? _.has(this.mixins, obj.type) :
-                    _.isString(obj) && this.mixins ? _.has(this.mixins, obj) : false;
+                return _.isFunction(obj) && self.mixins ? _.has(self.mixins, obj.type) :
+                    _.isString(obj) && self.mixins ? _.has(self.mixins, obj) : false;
             }
         };
 
@@ -67,22 +60,22 @@ define('bkit/dowi/Widget',
          * @param name the name of the signal to create
          * @returns the signal created
          */
-        Widget.prototype.$ = function (name) {
+        Widget.prototype.$ = function (self, name) {
             if (!name) {
                 throw new Error('Cannot create a signal without a name')
             }
-            this.s[name] = new Signal();
+            self.s[name] = new Signal();
             //remember values after they are emitted so they can be replayed by any handler added after the emission
-            this.s[name].memorize = true;
-            return this.s[name];
+            self.s[name].memorize = true;
+            return self.s[name];
         };
 
-        Widget.prototype.createSignal = function (name) {
-            return this.$(name);
+        Widget.prototype.createSignal = function (self, name) {
+            return self.$(name);
         };
 
-        Widget.prototype.getSignal = function (signal) {
-            return this.s[signal];
+        Widget.prototype.getSignal = function (self, signal) {
+            return self.s[signal];
         };
         /**
          * Provide a promise style response with a then and an else method.
@@ -92,18 +85,18 @@ define('bkit/dowi/Widget',
          *
          *@return {Promise}  with then and else methods. then is executed if the signal exists otherwise else is executed.
          * The methods "then" and "else" available on the return object both invoke their callback with
-         * the widget's "this" as the context;
+         * the widget's "self. as the context;
          */
-        Widget.prototype._ = function (signal) {
+        Widget.prototype._ = function (self, signal) {
             var res = signal;
             if (_.isString(signal)) {
-                res = this.getSignal(signal);
+                res = self.getSignal(signal);
             }
-            return new Promise(res, this, res);
+            return new Promise(res, self.res);
         };
 
-        Widget.prototype.respondsTo = function (signal) {
-            return this._(signal);
+        Widget.prototype.respondsTo = function (self, signal) {
+            return self._(signal);
         };
 
         /**
@@ -117,11 +110,11 @@ define('bkit/dowi/Widget',
          * the context must be a widget or something it is mixed into
          * @returns the binding created from the signal being connected to the given slot
          */
-        Widget.prototype.connect = function (signal, slot, once, priority, context) {
+        Widget.prototype.connect = function (self, signal, slot, once, priority, context) {
             //context should always be this or something it's mixed into
-            context = context ? context : this;
+            context = context ? context : self;
             var binding;
-            this._(signal)
+            self._(signal)
                 .then(function (signal) {
                     if (once) {
                         binding = signal.addOnce(slot, context, priority);
@@ -140,15 +133,14 @@ define('bkit/dowi/Widget',
          * @param signal The name of the signal to emit
          * @param params* one or more parameters to be passed as the signal's arguments
          */
-        Widget.prototype.emit = function (signal, params) {
-            var $widget = this;
+        Widget.prototype.emit = function (self, signal, params) {
             params = _.toArray(arguments).slice(1);
-            this._(signal)
+            self._(signal)
                 .then(function (s) {
-                    s.dispatch.apply(this, params);
+                    s.dispatch.apply(self, params);
                     setTimeout(function () {
                         s.forget();
-                    }, $widget.signal_linger_time)
+                    }, self.signal_linger_time)
                 })
                 .else(function () {
                     throw new Error("Attempting to emit an unknown signal " + signal);
@@ -157,11 +149,11 @@ define('bkit/dowi/Widget',
 
         /**
          * Every Mixin gets a unique hash code. This hash code is the same for all instances of that Mixin
-         * To get a hash per instance use the this.instanceId() method
+         * To get a hash per instance use the self.instanceId() method
          * @returns {int} The hash code for this widget
          */
-        Widget.prototype.hash = function () {
-            return this.hashCode;
+        Widget.prototype.hash = function (self) {
+            return self.hashCode;
         };
 
         /**
@@ -169,13 +161,12 @@ define('bkit/dowi/Widget',
          * which is the same for all instances of the same widget
          * @returns {int} the ID for this instance
          */
-        Widget.prototype.instanceId = function () {
-            return this.instance_id;
+        Widget.prototype.instanceId = function (self) {
+            return self.instance_id;
         };
 
-        Widget.prototype.toString = function () {
-            //console.log(this)
-            return JSON.stringify(this);
+        Widget.prototype.toString = function (self) {
+            return JSON.stringify(self);
         };
 
         return Widget;

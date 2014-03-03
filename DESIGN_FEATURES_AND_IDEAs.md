@@ -59,67 +59,134 @@ To that end, all properties set with Button.set is placed under the field "field
 All standard widgets in BKit use the Widget.attr.set and Widget.attr.get functions where attr is the namespace for Settable.
 
 ### Multi-level namespaces
-Multi-level namespaces would be nice if supported. A Widget can define it's name space as 'user.touch' and the Mixin will create
+Multi-level namespaces are supported. A Widget can define it's name space as 'user.touch' and the Mixin will create
 the user namespace if it doesn't exist and add touch to it. Any functions defined by a widget is then available under the
-user.touch namespace. Unfortunately, this isn't as trivial as it might sound take for example
+user.touch namespace. The implications of this design is briefly covered below.
+
+
+Anything added to fn.prototype is shared between all objects created from fn. So modifying this.arg on a or b
+results in the value being set on both a and b. Rarely if ever is this the desired effect.
+
+### Closure.self
+
+It is common for JS users to create a temporary variable and assign 'this' to it. This allows them to ensure they use the
+correct context within closures. This is also a viable solution to enable multi-level namespaces.
+BKit automatically injects an object as the first parameter of __every top level function__ of a namespace.
+i.e. If a widget Button as a namespace 'widget' then all functions mixed into 'widget' namespace will have an extra argument injected
+as the first parameter. This object should be treated as the context. This is done because there is no guarantee that
+'this' within a function refers to the same context, in fact it is unlikely and by design, 'this' should always refer to
+a 'Namespace' constructor. If a function takes no argument, the context object is still injected so a no-arg function
+becomes a function which takes a single parameter, the context.
+
+### this VS self
+
+Multi-level namespaces come with one further advantage. __Isolation__! Every namespace is isolated on a per instance basis.
+i.e. Given a widget Button under the namespace touch it has a function called pressed i.e. Button.touch.pressed.
+when the pressed function is called, "this" inside the function refers to the namespace "touch". This means that
+if a widget makes an assignment such as this.name = 'Courtney' and in the mouse namespace the pressed function also makes
+an assignment such as this.name = 'Robinson'. Referencing this.name will return 'Courtney' to any function in the "touch"
+namespace and return 'Robinson' to any function within the "mouse" namespace.
+
+Contrary to the above point, if both functions from different namespaces does the assignment self.name. The value returned
+depends on which function did the assignment last. Where self is the first argument that was automatically injected to each function.
+A long winded way of saying self is shared across all namespaces while each namespace is isolated.
+
+### Benefits & Tradeoff
+
+Namespaces are a powerful and fundamental design feature. Not only are they incredibly useful in their own right, they
+enhance the usefulness of Mixins greatly.
+One may wonder what is being traded in order to support the functionality offered by multi-level namespaces. The answer
+is invocation speed. While it's not a noticeable trade off it is the biggest.
+Mixins are done for every instanciation of a widget and hence Namespaces are created on each invocation.
+There are reasons why Mixin can't be done once at a function prototype level and has to be done for each instance.
+Mainly that namespaces would become very tricky since a namesapce would be defined on the prototype of a function/widget
+any sharing would mean that __all__ instances of a widget share the same properties.
+
+## Constructor
+
+Function "contructors" are only useful for debugging by helping to identify the type of an object.
+They should not be used to perform initialization. An init method should be provided instead.
+Constructors are not guaranteed to be invoked at all. In fact, most aren't. When a mixin happens, only the constructor
+of the last function mixed in is invoked with the new operator and this may change should a better approach be found.
+A constructor is never given any arguments. This is to discourage the temptation to attempt to initialize anything
+in the constructor.
+
+### Order of initialization
+All mixins that provide an init function on their prototype will have the init function invoked.
+If a widget is defined such that [Widget1,Widget2],Widget3 are the parameters to the mixin op.
+The init method of Widget1 is called first, followed by Widget2's and then Widget3's.
+
+The option object is always present, if none is supplied by the user defaults is taken from all the mixin's prototypes and merged
+if no mixin provides a default and the user doesn't provide any then an empty object is set on the context as self.options.
+
+##### Default options
+
+When a widget is defined, it can provide a default options object on it's prototype by having an attribute named "defaults"
+This default is used if no user options are provided on initialization.
+If a user option is provided, it is merged with the defaults.
+If multiple mixins provide defaults then all defaults are merged. The mixin added last takes precedence in case of a collision
+in the defaults.
+The user's options takes precedence over any defaults.
+The final options object is available on self.options where self is the context injected into every function.
+
+## Example Mixin
 
 ```javascript
 
-        function Namespace() {
-        }
+//example 1
 
-        /**
-         * Gets the function prototype to which a widget's functions should be added
-         * @param fn the function whose namespace should be fetched
-         * @param strName a valid namespace - a simple string such as 'touch' our 'user.touch'.
-         * A dot separated namespace causes any non-existent parent to be created.
-         * @returns {Object|Function|*}
-         */
-        function getNamespace(fn, strName) {
-            var packages = strName.split('.'), namespace = fn.prototype;
-            for (var i in packages) {
-                if (packages.hasOwnProperty(i)) {
-                    var name = packages[i];
-                    if (name && name != '') {
-                        if (!namespace[name]) {
-                            namespace[name] = {};
-                        }
-                        namespace = namespace[name];
-                    }
-                }
-            }
-            return namespace;
-        }
+define('bkit/dowi/MyWidget',
+    [
+        'module',
+        'bkit/Mixin',
+        'bkit/dowi/Widget'
+    ],
+    function (module, Mixin, Widget) {
+     //create a function only for it's constructor and prototype
+     function MyWidget() {
+     }
+     // namespace and type are required. namespace is enforced, as in mixin fails if it isn't provided
+     // using 'bkit' as the namespace puts all functions on MyWidget's prototype on the main object, NOT under a namespace
+     //called bkit, this is the only 'special case' to support situations where a namespace isn't ideal
+     MyWidget.prototype.namespace = 'bkit'; //in general this should be something like 'touch'
+     MyWidget.prototype.type = module.id;
 
-        function A() {
-        }
+     //optionally provide an init function that can be used for initialization
+     MyWidget.prototype.init = function (self) {
+         self.options.label = 'My Widget';
+     };
 
-        //A.prototype.a = {123: 12345};
-        //console.log(A.prototype);
-        var namespace = getNamespace(A, 'a.b.c');
-        console.log(namespace);
-        namespace.hello = function (arg) {
-            this.arg = arg;
-            console.log(this);
-            //console.log('say hello world bitches => ' + arg);
-        };
-        a = new A();
-        b = new A();
-        a.a.b.c.hello.call(b, 'b');
-        a.a.b.c.hello('b proto');
-        a.a.b.c.hello.call(a, 'a');
-        a.a.b.c.hello('a proto');
-        //b.a.b.c.hello('from b');
-        //console.log(a, b);
+     MyWidget.prototype.hello = function(self, arg1, arg2){
+     //self refers to the shared context, arg1 and arg2 are arguments the function would otherwise need to do it's job
+     //this function is still called using MyWidget.hello('arg1','arg2'), self is injected automatically.
+     }
+
+     return Mixin([Widget], MyWidget);
+    });
+
+//example 2
+
+define('bkit/dowi/SecondWidget',
+    [
+        'module',
+        'bkit/Mixin',
+        'bkit/dowi/Widget'
+    ],
+    function (module, Mixin, Widget) {
+     function SecondWidget() {
+     }
+     //put these functions under the touch namespace
+     SecondWidget.prototype.namespace = 'touch';
+     SecondWidget.prototype.type = module.id;
+
+     SecondWidget.prototype.pressed = function(self, e){
+        //do something fancy with e
+     }
+
+     return Mixin([Widget], SecondWidget);
+    });
 
 ```
-
-Anything added to fn.prototype is shared between all objects created from A(). So modifying this.arg on a or b
-results in the value being set on both a and b.
-Rarely if ever is this the desired effect. Need a way around it before multi-level namespaces can be supported but this
-is good to keep in mind for a TODO perhaps in version 2...where widgets might return factories that return objects
-so a mixin can happen on the object i.e. not using .prototype which would enable multi-level namespaces to work.
-
 ## 10K ft design
 
 BKit is designed to work the way a typical application does. At least in terms of how it is structured.

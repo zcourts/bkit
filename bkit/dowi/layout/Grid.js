@@ -11,8 +11,7 @@ define('bkit/dowi/layout/Grid',
         }
 
         Grid.prototype.type = module.id;
-
-
+        Grid.prototype.namespace = 'bkit';
 
         return Mixin([Widget, Container], Grid);
     });
