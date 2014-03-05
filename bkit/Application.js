@@ -28,8 +28,8 @@ define('bkit/Application',
             self.set('router', router);
             self.set('url', hasher);
 
-            self.e.create('pageRegistered');
-            self.e.create('routeChanged');
+            self.event.create('pageRegistered');
+            self.event.create('routeChanged');
             //
             self.addAcceptableType(Page);
 
