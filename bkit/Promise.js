@@ -8,6 +8,7 @@ define('bkit/Promise',
          * @param success true or false, if true the then function is applied otherwise else is applied
          * @param context the context which is used to execute the callbacks to then and else
          * @param args* 1 or more arguments to pass to the then/else callbacks
+         * @global
          * @constructor
          */
         function Promise(success, context, args) {
@@ -20,11 +21,10 @@ define('bkit/Promise',
          * Executes the given callback if this promise was successful
          * @param callback  the callback to execute
          * @returns {Promise}  this promise
+         * @memberof Promise
          */
         Promise.prototype.then = function (callback) {
-            this.success && callback ?
-                callback.apply(this.context, this.args) :
-                false;
+            this.success && _.isFunction(callback) ? callback.apply(this.context, this.args) : false;
             return this;
         };
 
@@ -34,11 +34,10 @@ define('bkit/Promise',
          * Executes the given callback if this promise was NOT successful
          * @param callback  the callback to execute
          * @returns {Promise}  this promise
+         * @memberof Promise
          */
-        Promise.prototype.else = function (callback) {
-            !this.success && callback ?
-                callback.apply(this.context, this.args) :
-                false;
+        Promise.prototype.otherwise = function (callback) {
+            !this.success && _.isFunction(callback) ? callback.apply(this.context, this.args) : false;
             return this;
         };
         return Promise;
