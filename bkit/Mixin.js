@@ -1,28 +1,34 @@
-define('bkit/Mixin', ['require', 'underscore', 'jquery'], function (require, _, $) {
+/**
+ * This module is central to BKit. It is responsible for mixing any number of modules together to create new ones.
+ * @param mixins {Array} A list of modules that are to be mixed in
+ * @param MixinWidget {*} The module which all the mixins will be mixed into
+ * @return {MixinContainer} A function which represents the results of performing a mix in.
+ * This function should be invoked inline i.e. MixinContainer() although new MixinContainer() will work it requires
+ * additional computation for the instance to become the expected type.
+ * @module
+ */
+define('bkit/Mixin', ['require', 'underscore', 'jquery', 'bkit/Namespace'], function (require, _, $, Namespace) {
     return   function (mixins, MixinWidget) {
         //MixinWidget is just another widget to be mixed in and is treated no differently in that sense
         mixins.push(MixinWidget);
-
-        function Namespace() {
-        }
 
         /**
          * Given an instance, get or create the namespace given by strName
          * @param instance the instance on which the namespace is required to exist
          * @param strName the namespace to get, this can be a simple value such as 'bkit' or a dot separated
          * string such as 'user.event.touch', unless each parent namespace exists it will be created
-         * IFF strName == 'bkit' then instance is returned directly so that attributes are added to the instance without
+         * IFF strName == 'this' then instance is returned directly so that attributes are added to the instance without
          * a namespace.
          * @returns {Namespace} a namespace to which properties/functions should be added in the example above the
          * 'touch' namespace is returned
          */
         function getNamespace(instance, strName) {
-            if (strName == 'bkit') {
+            if (strName == 'this') {
                 return instance;
             }
             var namespace = instance;
             _.each(strName.split('.'), function (value) {
-                if (value && value != '') {
+                if (value && value !== '') {
                     if (!namespace[value]) {
                         namespace[value] = new Namespace();
                     }
@@ -44,8 +50,8 @@ define('bkit/Mixin', ['require', 'underscore', 'jquery'], function (require, _, 
             return  function () {
                 var args = Array.prototype.slice.call(arguments);
                 args.unshift(instance);
-                fn.apply(namespace, args);
-            }
+                return fn.apply(namespace, args);
+            };
         }
 
         /**
@@ -71,7 +77,15 @@ define('bkit/Mixin', ['require', 'underscore', 'jquery'], function (require, _, 
             });
         }
 
-        return function MixinContainer(userOpts) {
+        /**
+         * A function representing the results of performing a mixin
+         * @param userOpts an object representing the configuration to be passed to the mixin
+         * @returns {MixinWidget} the original widget that had other widget's mixed in. This allows type to be maintained
+         * so that instanceof and so on work as expected.
+         * @constructor
+         * @global
+         */
+        function MixinContainer(userOpts) {
             var instance = new MixinWidget(),
             //true as the first argument causes a deep extend so we don't loose properties
             //second arg is an empty default object
@@ -119,5 +133,11 @@ define('bkit/Mixin', ['require', 'underscore', 'jquery'], function (require, _, 
             //always return instance regardless of how the function was invoked
             return instance;
         }
-    }
+
+        //because the prototype of the function returned is mixed in
+        //but we need the MixinContainer to provide a custom constructor
+        //designed to avoid every object having MixinContainer as their constructor rather than the real type
+        MixinContainer.prototype = MixinWidget.prototype;
+        return MixinContainer;
+    };
 });
