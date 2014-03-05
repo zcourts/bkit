@@ -42,6 +42,27 @@ If a "real" adjective does exist for a given word whether it ends with able or n
 
 By isolating behaviour from data BKit promotes re-usability making it very compact and generic.
 
+## Class vs Mixin - Documentation
+
+In general (especially in documentation) a difference between a "Class" and a "Mixin" is made.
+Firstly, this is only an idealism,there is technically no reason why a module documented as a class cannot be mixed in
+and likewise there is no reason a module documented as a mixin cannot be treated as a class.
+
+So why do it? It has been done because generally speaking, a "Mixin" should be a small module that is able to add a behaviour
+or a set of behavioural traits to an object/class. While a "Class" is meant as a module that is instanciated with the new
+keyword, or used inline.
+
+This convention is adopted to try and make it easier to see which modules are meant to be used as objects against those
+meant to be mixed into others. However, there are cases where there is overlap and it makes just as much sense to use a module
+directly as it does to mix it into another.
+
+To document a module as a Mixin, add the @mixin annotation to the module's constructor. To document a module as a Class
+add the @constructor annotation. In all cases, the @global annotation is required for JSDoc to recognise a requirejs
+module as being globally accessible.
+
+Unfortunately JSDoc doesn't automatically document a function added to another function's prototype as being a method of
+said function. To document a function as a method, use the @memberof annotation
+
 ## Namespaces
 
 Taking the approach of including mixed in behaviour means it is possible for multiple behaviours to have the same function name.
@@ -146,9 +167,9 @@ define('bkit/dowi/MyWidget',
      function MyWidget() {
      }
      // namespace and type are required. namespace is enforced, as in mixin fails if it isn't provided
-     // using 'bkit' as the namespace puts all functions on MyWidget's prototype on the main object, NOT under a namespace
-     //called bkit, this is the only 'special case' to support situations where a namespace isn't ideal
-     MyWidget.prototype.namespace = 'bkit'; //in general this should be something like 'touch'
+     // using 'this' as the namespace puts all functions on MyWidget's prototype on the main object, NOT under a namespace
+     //called this, this is the only 'special case' to support situations where a namespace isn't ideal
+     MyWidget.prototype.namespace = 'this'; //in general this should be something like 'touch'
      MyWidget.prototype.type = module.id;
 
      //optionally provide an init function that can be used for initialization
