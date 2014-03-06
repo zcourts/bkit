@@ -1,13 +1,14 @@
 define('bkit/Application',
     [
         'module', 'hasher', 'crossroads', 'underscore', 'bkit/Mixin', 'bkit/Attributable', 'bkit/Widget',
-        'bkit/Dispatchable', 'bkit/Containable', 'bkit/Page', 'bkit/Promise', 'bkit/Util'
-    ], function (module, hasher, crossroads, _, Mixin, Attributable, Widget, Dispatchable, Containable, Page, Promise, Util) {
+        'bkit/Dispatchable', 'bkit/Displayable', 'bkit/Containable', 'bkit/Page', 'bkit/Promise', 'bkit/Util'
+    ], function (module, hasher, crossroads, _, Mixin, Attributable, Widget, Dispatchable, Displayable, Containable, Page, Promise, Util) {
         /**
          * @mixes Widget
          * @mixes Attributable
          * @mixes Dispatchable
          * @mixes Containable
+         * @mixes Displayable
          * @constructor
          * @global
          */
@@ -19,6 +20,9 @@ define('bkit/Application',
         Application.prototype.defaults = {
             url: {
                 prefix: '/' //could be ! to support Google crawlable ajax sites
+            },
+            dom: {
+                element: 'body'
             }
         };
 
@@ -48,5 +52,5 @@ define('bkit/Application',
         };
 
 
-        return Mixin([Widget, Attributable, Dispatchable, Containable], Application);
+        return Mixin([Widget, Attributable, Dispatchable, Containable, Displayable], Application);
     });

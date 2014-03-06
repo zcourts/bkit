@@ -3,15 +3,11 @@
  */
 define('bkit/Widget',
     [
-        'require',
-        'jquery',
+        'module',
         'signals',
-        'underscore',
-        'module'                                   ,
-        'bkit/Promise',
         'bkit/Util'
     ],
-    function (require, $, Signal, _, module, Promise, Util) {
+    function (module, Signal, Util) {
         /**
          * @mixin
          * @global
@@ -21,13 +17,9 @@ define('bkit/Widget',
 
         Widget.prototype.type = module.id;
         Widget.prototype.namespace = 'this';
-        Widget.prototype.defaults = {signal_linger_time: 30000};
+        Widget.prototype.defaults = {};
 
         Widget.prototype.init = function (self) {
-            self.template = null;
-            self.domNode = null;
-            self.s = {};
-
             //generate the hash code for this widget
             var allMixinNames = "";
             _.each(self.mixins, function (self, val, key) {
@@ -38,6 +30,7 @@ define('bkit/Widget',
             //and the instance id
             self.instance_id = Util.hash(new Date().getTime() + "" + Math.random());
         };
+
         /**
          * Check if the given object is of the specified type.
          * An object is of a type if that type was mixed into the object
@@ -52,7 +45,6 @@ define('bkit/Widget',
             var exists = _.has(self.mixins, obj);
             if (!exists) {
                 for (var i in self.mixins) {
-                    console.log(self.mixins[i] == obj, self.mixins[i], obj)
                     exists = _.isFunction(obj) ? self.mixins[i] == obj : self.mixins[i] instanceof obj;
                     if (exists) {
                         break;

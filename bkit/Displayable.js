@@ -29,6 +29,8 @@ define('bkit/Displayable',
 
         Displayable.prototype.init = function (self) {
             this.element = $(self.options.dom.element);
+            this.parent = this.element.parent();
+            console.log(this);
         };
 
         /**

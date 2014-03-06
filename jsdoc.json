@@ -11,7 +11,15 @@
     "plugins": [],
     "templates": {
         "cleverLinks": true,
-        "monospaceLinks": true
+        "monospaceLinks": true,
+        "systemName": "BKit",
+        "footer": "BKit, the lighter, better widget toolkit",
+        "copyright": "BKit Copyright © 2014",
+        "navType": "vertical",
+        "theme": "journal",
+        "linenums": true,
+        "collapseSymbols": true,
+        "inverseNav": true
     },
     "opts": {
         "template": "templates/default",
