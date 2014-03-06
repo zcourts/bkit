@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>BKit Index</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	
+	<link type="text/css" rel="stylesheet" href="styles/site.journal.css">
+	
+</head>
+
+<body>
+<div class="container-fluid">
+	<div class="navbar navbar-fixed-top navbar-inverse">
+		<div class="navbar-inner">
+			<a class="brand" href="index.html">BKit</a>
+			<ul class="nav">
+				
+				<li class="dropdown">
+					<a href="namespaces.list.html" class="dropdown-toggle" data-toggle="dropdown">Namespaces<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu ">
+						
+						<li>
+							<a href="app.html">app</a>
+						</li>
+						
+						<li>
+							<a href="dom.html">dom</a>
+						</li>
+						
+						<li>
+							<a href="event.html">event</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
+				<li class="dropdown">
+					<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu ">
+						
+						<li>
+							<a href="module-Mixin.html">Mixin</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
+				<li class="dropdown">
+					<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu ">
+						
+						<li>
+							<a href="Application.html">Application</a>
+						</li>
+						
+						<li>
+							<a href="MixinContainer.html">MixinContainer</a>
+						</li>
+						
+						<li>
+							<a href="Namespace.html">Namespace</a>
+						</li>
+						
+						<li>
+							<a href="Page.html">Page</a>
+						</li>
+						
+						<li>
+							<a href="Promise.html">Promise</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
+				<li class="dropdown">
+					<a href="mixins.list.html" class="dropdown-toggle" data-toggle="dropdown">Mixins<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu ">
+						
+						<li>
+							<a href="Attributable.html">Attributable</a>
+						</li>
+						
+						<li>
+							<a href="Containable.html">Containable</a>
+						</li>
+						
+						<li>
+							<a href="Dispatchable.html">Dispatchable</a>
+						</li>
+						
+						<li>
+							<a href="Displayable.html">Displayable</a>
+						</li>
+						
+						<li>
+							<a href="Movable.html">Movable</a>
+						</li>
+						
+						<li>
+							<a href="Resizable.html">Resizable</a>
+						</li>
+						
+						<li>
+							<a href="SimpleEvent.html">SimpleEvent</a>
+						</li>
+						
+						<li>
+							<a href="Widget.html">Widget</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
+			</ul>
+		</div>
+	</div>
+
+	<div class="row-fluid">
+
+		
+		<div class="span8">
+			
+				<div id="main">
+					
+
+
+	
+	<span class="page-title">Index</span>
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+
+
+
+
+
+    <section>
+        <article><h1 id="bkit-bootstrap-toolkit">BKit - Bootstrap Toolkit</h1>
+<p>BKit is a JavaScript toolkit which provides a set of components for building advanced client side user interfaces.
+BKit has 3 major set of components:</p>
+<ol>
+<li>Widgets</li>
+<li>Layouts</li>
+<li>Views</li>
+</ol>
+<h2 id="design-and-conventions">Design and Conventions</h2>
+<p>BKit is designed with the idea that you create a data model for a domain and then decide what behaviour it should have.
+&quot;Mixins&quot; are used to support this philosophy.
+For example if you were designing a button, the suggested approach is to think about what data a button needs.
+Let's say every button has a label, size and colour. Size and colour are optional.
+i.e.
+var Button =
+{
+    label: &quot;Button&quot;,
+    width: &quot;5em&quot;,
+    height:&quot;1.5em&quot;,
+    colour:&quot;#000&quot;
+}</p>
+<p>What does a button do? What events does it provide or listen to?
+It's displayable, i.e. it can be added, moved and removed from the DOM
+It's Resizable, i.e. it's size can change
+It has Settable properties i.e. label can be set to a different value
+It is &quot;Mouseable&quot; i.e. it responds to mouse events such as click, hover or mouse move etc
+It is &quot;Touchable&quot; i.e. it responds to touch events
+It is &quot;Keyable&quot; i.e. it responds to keyboard events (key up,down,press,release etc)</p>
+<p>These capture some of the main some of the main properties of a potential button widget.
+Each of these &quot;able&quot; names can be thought of as a set of common behaviour that is re-usable and applicable to many
+types of widgets.
+&quot;able&quot; can generally be taken to mean &quot;able to&quot; i.e anything with this mixin is able to have the given behaviour.
+Words with this suffix are &quot;usually&quot; adjectives aka &quot;describing&quot; words.</p>
+<p>Granted the words created by suffixing able doesn't always make sense or form &quot;real&quot; words but it's a convention that
+re-enforces the design so it's used in most places unless it sounds really stupid in which case something more appropriate is used.
+If a &quot;real&quot; adjective does exist for a given word whether it ends with able or not this adjective is used for the mixin's name.</p>
+<p>By isolating behaviour from data BKit promotes re-usability making it very compact and generic.</p>
+<h2 id="class-vs-mixin-documentation">Class vs Mixin - Documentation</h2>
+<p>In general (especially in documentation) a difference between a &quot;Class&quot; and a &quot;Mixin&quot; is made.
+Firstly, this is only an idealism,there is technically no reason why a module documented as a class cannot be mixed in
+and likewise there is no reason a module documented as a mixin cannot be treated as a class.</p>
+<p>So why do it? It has been done because generally speaking, a &quot;Mixin&quot; should be a small module that is able to add a behaviour
+or a set of behavioural traits to an object/class. While a &quot;Class&quot; is meant as a module that is instanciated with the new
+keyword, or used inline.</p>
+<p>This convention is adopted to try and make it easier to see which modules are meant to be used as objects against those
+meant to be mixed into others. However, there are cases where there is overlap and it makes just as much sense to use a module
+directly as it does to mix it into another.</p>
+<p>To document a module as a Mixin, add the @mixin annotation to the module's constructor. To document a module as a Class
+add the @constructor annotation. In all cases, the @global annotation is required for JSDoc to recognise a requirejs
+module as being globally accessible.</p>
+<p>Unfortunately JSDoc doesn't automatically document a function added to another function's prototype as being a method of
+said function. To document a function as a method, use the @memberof annotation</p>
+<h2 id="namespaces">Namespaces</h2>
+<p>Taking the approach of including mixed in behaviour means it is possible for multiple behaviours to have the same function name.
+This would create a clash on the our data objects. To avoid this, every Mixin has a namespace.
+Any Mixin without a namespace will cause the mixin attempt to fail.
+For example, if we have a widget Button (as above) and we mixed in Mouseable and Touchable.
+These two mixins could have a &quot;pressed&quot; and &quot;release&quot; event that would conflict. By using a namespace they can be accessed as:
+Button.touch.pressed
+Button.touch.released
+Button.mouse.pressed
+Button.mouse.released</p>
+<p>This means that the data properties of Button should not have any names directly on the object that clashes with a mixin.
+To that end, all properties set with Button.set is placed under the field &quot;fields&quot;.
+All standard widgets in BKit use the Widget.attr.set and Widget.attr.get functions where attr is the namespace for Settable.</p>
+<h3 id="multi-level-namespaces">Multi-level namespaces</h3>
+<p>Multi-level namespaces are supported. A Widget can define it's name space as 'user.touch' and the Mixin will create
+the user namespace if it doesn't exist and add touch to it. Any functions defined by a widget is then available under the
+user.touch namespace. The implications of this design is briefly covered below.</p>
+<p>Anything added to fn.prototype is shared between all objects created from fn. So modifying this.arg on a or b
+results in the value being set on both a and b. Rarely if ever is this the desired effect.</p>
+<h3 id="closure-self">Closure.self</h3>
+<p>It is common for JS users to create a temporary variable and assign 'this' to it. This allows them to ensure they use the
+correct context within closures. This is also a viable solution to enable multi-level namespaces.
+BKit automatically injects an object as the first parameter of <strong>every top level function</strong> of a namespace.
+i.e. If a widget Button as a namespace 'widget' then all functions mixed into 'widget' namespace will have an extra argument injected
+as the first parameter. This object should be treated as the context. This is done because there is no guarantee that
+'this' within a function refers to the same context, in fact it is unlikely and by design, 'this' should always refer to
+a 'Namespace' constructor. If a function takes no argument, the context object is still injected so a no-arg function
+becomes a function which takes a single parameter, the context.</p>
+<h3 id="this-vs-self">this VS self</h3>
+<p>Multi-level namespaces come with one further advantage. <strong>Isolation</strong>! Every namespace is isolated on a per instance basis.
+i.e. Given a widget Button under the namespace touch it has a function called pressed i.e. Button.touch.pressed.
+when the pressed function is called, &quot;this&quot; inside the function refers to the namespace &quot;touch&quot;. This means that
+if a widget makes an assignment such as this.name = 'Courtney' and in the mouse namespace the pressed function also makes
+an assignment such as this.name = 'Robinson'. Referencing this.name will return 'Courtney' to any function in the &quot;touch&quot;
+namespace and return 'Robinson' to any function within the &quot;mouse&quot; namespace.</p>
+<p>Contrary to the above point, if both functions from different namespaces does the assignment self.name. The value returned
+depends on which function did the assignment last. Where self is the first argument that was automatically injected to each function.
+A long winded way of saying self is shared across all namespaces while each namespace is isolated.</p>
+<h3 id="benefits-tradeoff">Benefits &amp; Tradeoff</h3>
+<p>Namespaces are a powerful and fundamental design feature. Not only are they incredibly useful in their own right, they
+enhance the usefulness of Mixins greatly.
+One may wonder what is being traded in order to support the functionality offered by multi-level namespaces. The answer
+is invocation speed. While it's not a noticeable trade off it is the biggest.
+Mixins are done for every instanciation of a widget and hence Namespaces are created on each invocation.
+There are reasons why Mixin can't be done once at a function prototype level and has to be done for each instance.
+Mainly that namespaces would become very tricky since a namesapce would be defined on the prototype of a function/widget
+any sharing would mean that <strong>all</strong> instances of a widget share the same properties.</p>
+<h2 id="constructor">Constructor</h2>
+<p>Function &quot;contructors&quot; are only useful for debugging by helping to identify the type of an object.
+They should not be used to perform initialization. An init method should be provided instead.
+Constructors are not guaranteed to be invoked at all. In fact, most aren't. When a mixin happens, only the constructor
+of the last function mixed in is invoked with the new operator and this may change should a better approach be found.
+A constructor is never given any arguments. This is to discourage the temptation to attempt to initialize anything
+in the constructor.</p>
+<h3 id="order-of-initialization">Order of initialization</h3>
+<p>All mixins that provide an init function on their prototype will have the init function invoked.
+If a widget is defined such that [Widget1,Widget2],Widget3 are the parameters to the mixin op.
+The init method of Widget1 is called first, followed by Widget2's and then Widget3's.</p>
+<p>The option object is always present, if none is supplied by the user defaults is taken from all the mixin's prototypes and merged
+if no mixin provides a default and the user doesn't provide any then an empty object is set on the context as self.options.</p>
+<h5 id="default-options">Default options</h5>
+<p>When a widget is defined, it can provide a default options object on it's prototype by having an attribute named &quot;defaults&quot;
+This default is used if no user options are provided on initialization.
+If a user option is provided, it is merged with the defaults.
+If multiple mixins provide defaults then all defaults are merged. The mixin added last takes precedence in case of a collision
+in the defaults.
+The user's options takes precedence over any defaults.
+The final options object is available on self.options where self is the context injected into every function.</p>
+<h2 id="example-mixin">Example Mixin</h2>
+<pre><code class="lang-javascript">
+//example 1
+
+define('bkit/dowi/MyWidget',
+    [
+        'module',
+        'bkit/Mixin',
+        'bkit/dowi/Widget'
+    ],
+    function (module, Mixin, Widget) {
+     //create a function only for it's constructor and prototype
+     function MyWidget() {
+     }
+     // namespace and type are required. namespace is enforced, as in mixin fails if it isn't provided
+     // using 'this' as the namespace puts all functions on MyWidget's prototype on the main object, NOT under a namespace
+     //called this, this is the only 'special case' to support situations where a namespace isn't ideal
+     MyWidget.prototype.namespace = 'this'; //in general this should be something like 'touch'
+     MyWidget.prototype.type = module.id;
+
+     //optionally provide an init function that can be used for initialization
+     MyWidget.prototype.init = function (self) {
+         self.options.label = 'My Widget';
+     };
+
+     MyWidget.prototype.hello = function(self, arg1, arg2){
+     //self refers to the shared context, arg1 and arg2 are arguments the function would otherwise need to do it's job
+     //this function is still called using MyWidget.hello('arg1','arg2'), self is injected automatically.
+     }
+
+     return Mixin([Widget], MyWidget);
+    });
+
+//example 2
+
+define('bkit/dowi/SecondWidget',
+    [
+        'module',
+        'bkit/Mixin',
+        'bkit/dowi/Widget'
+    ],
+    function (module, Mixin, Widget) {
+     function SecondWidget() {
+     }
+     //put these functions under the touch namespace
+     SecondWidget.prototype.namespace = 'touch';
+     SecondWidget.prototype.type = module.id;
+
+     SecondWidget.prototype.pressed = function(self, e){
+        //do something fancy with e
+     }
+
+     return Mixin([Widget], SecondWidget);
+    });</code></pre>
+<h2 id="10k-ft-design">10K ft design</h2>
+<p>BKit is designed to work the way a typical application does. At least in terms of how it is structured.
+The following broad categories/types are common:</p>
+<ul>
+<li><code>Application</code></li>
+<li><code>Page</code> (can contain other pages i.e. sub-pages)</li>
+<li><code>Widget</code>/Component - There are several widgets, these can themselves be categorized but common ones are
+  <code>Container</code>, <code>DataTable</code>, <code>ButtonGroup</code>, <code>Button</code>, etc</li>
+<li><code>Router</code></li>
+</ul>
+<p>At the outter most layer is an <code>Application</code>. This is always the entry point for any URL.
+An application contains one or more pages.
+Each <code>Page</code> in turn can contain one or more <code>Widget</code>s.
+Each page can be reached by a unique URL, be opened by triggering an event with the page's unique identifier or by passing
+the object representing the page.
+A <code>Page</code> can contain one or more <code>Container</code>s.
+A container is a <strong>layout component</strong> which determines it's own size and position as well as the size and position of it's
+<strong>direct children</strong>. This means multiple containers can be next to each other if their individual sizing allows for it.
+A widget is placed inside a container or directly inside a page (so layout is left to the browser/css of the page's container element).
+Widgets can be nested. If a <code>Widget</code> is a direct child of another widget the widget's position/layout is determined by it's parent widget.
+The ideal/preferred way of nesting widgets is to place a layout container in the widget within which further widgets are placed
+thereby letting the container widget be responsible for the layout of the nested widgets.</p>
+<p>The <code>Router</code> is attached to an <code>Application</code>. There is a single router for the entire application.
+Where HTML5 URL manipulation is available it is preferred, as a fall back the hash bang syntax is used i.e. url.com/app#!some/path
+If HTML5 URL manipulation is unavailable and a request URL comes in as url.com/app/some/path the router will change it to url.com/app#!some/path
+and all subsequent modification of the URL will only change the hash component of the URL.
+The router is also responsible for setting URL history if it can. This is done for any Page which does not have it's history
+property disabled.</p>
+<h2 id="events">Events</h2>
+<p>The entire toolkit is event driven allowing 1 to many event notifications.
+To help avoid issues caused by using string names as events BKit requires an existing function in order to subscribe to
+and event.
+Because of this, all widgets must register all events it intends to emit. Furthermore, the namespace convention described above
+enables the ability to address events in a reader friendly form i.e. Button.touch.tapped.listen() or Button.touch.tapped.disptach(arg1,arg2)
+An interested party can therefore use an event by</p>
+<pre><code class="lang-javascript">
+myFunc = function(arg1,arg2,...){}
+//subscribe to tapped event
+Button.touch.tapped.subscribe(myFunc)
+//trigger the tapped event with n args
+// NOTE: events like this are automatically dispatched with user interaction but can also be done manually
+Button.touch.tapped.disptach(arg1,arg2,...)
+//later unsubscribe from an event
+Button.touch.tapped.unsubscribe(myFunc)
+
+//where Button is a Button instance, not the Mixin</code></pre></article>
+    </section>
+
+
+
+
+
+
+
+				</div>
+
+				<div class="clearfix"></div>
+				<footer>
+					
+					BKit, the lighter, better widget toolkit
+					<br />
+					
+					
+		<span class="copyright">
+		BKit Copyright © 2014
+		</span>
+					<br />
+					
+		<span class="jsdoc-message">
+		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha4</a>
+		on Thu Mar 06 2014 20:19:29 GMT+0000 (GMT) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+		</span>
+				</footer>
+			</div>
+
+			
+			<div class="span3">
+				<div id="toc"></div>
+			</div>
+			
+			<br clear="both">
+		</div>
+
+	</div>
+	<script src="scripts/sunlight.js"></script>
+	<script src="scripts/sunlight.javascript.js"></script>
+	<script src="scripts/sunlight-plugin.doclinks.js"></script>
+	<script src="scripts/sunlight-plugin.linenumbers.js"></script>
+	<script src="scripts/sunlight-plugin.menu.js"></script>
+	<script src="scripts/jquery.min.js"></script>
+	<script src="scripts/jquery.scrollTo.js"></script>
+	<script src="scripts/jquery.localScroll.js"></script>
+	<script src="scripts/bootstrap-dropdown.js"></script>
+	<script src="scripts/toc.js"></script>
+
+
+	<script>  Sunlight.highlightAll({lineNumbers:true,  showMenu: true, enableDoclinks :true}); </script>
+
+	<script>
+		$( function () {
+			$( "#toc" ).toc( {
+			    anchorName  : function(i, heading, prefix) {
+					return $(heading).attr("id") || ( prefix + i );
+				},
+				selectors   : "h1,h2,h3,h4",
+				showAndHide : false,
+				scrollTo    : 60
+			} );
+			$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+			$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+
+		} );
+	</script>
+
+	
+	<script>
+		$( function () {
+			$('#main').localScroll({
+				offset: { top: 56 } //offset by the height of your header (give or take a few px, see what works for you)
+			});
+			$( "dt h4.name" ).each( function () {
+				var $this = $( this );
+				var icon = $( "<i/>" ).addClass( "icon-plus-sign" ).addClass( "pull-right" ).addClass( "icon-white" );
+				var dt = $this.parents( "dt" );
+				var children = dt.next( "dd" );
+
+				$this.append( icon ).css( {cursor : "pointer"} );
+				$this.addClass( "member-collapsed" ).addClass( "member" );
+
+				children.hide();
+				$this.toggle( function () {
+					icon.addClass( "icon-minus-sign" ).removeClass( "icon-plus-sign" ).removeClass( "icon-white" );
+					$this.addClass( "member-open" ).removeClass( "member-collapsed" );
+					children.slideDown();
+				}, function () {
+					icon.addClass( "icon-plus-sign" ).removeClass( "icon-minus-sign" ).addClass( "icon-white" );
+					$this.addClass( "member-collapsed" ).removeClass( "member-open" );
+					children.slideUp();
+				} );
+			} );
+		} );
+	</script>
+	
+
+</body>
+</html>
