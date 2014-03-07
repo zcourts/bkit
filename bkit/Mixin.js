@@ -7,7 +7,7 @@
  * additional computation for the instance to become the expected type.
  * @module
  */
-define('bkit/Mixin', ['require', 'underscore', 'jquery', 'bkit/Namespace'], function (require, _, $, Namespace) {
+define('bkit/Mixin', [ 'underscore', 'jquery', 'bkit/Namespace'], function (_, $, Namespace) {
     return   function (mixins, MixinWidget) {
         //MixinWidget is just another widget to be mixed in and is treated no differently in that sense
         mixins.push(MixinWidget);
@@ -47,7 +47,7 @@ define('bkit/Mixin', ['require', 'underscore', 'jquery', 'bkit/Namespace'], func
          */
         function partial(namespace, instance, fn) {
             //namespace[name] = _.partial.call(namespace, value, instance); doesn't set 'this' to namespace, revisit
-            return  function () {
+            return  function PartiallyAppliedFunction() {
                 var args = Array.prototype.slice.call(arguments);
                 args.unshift(instance);
                 return fn.apply(namespace, args);
@@ -62,7 +62,6 @@ define('bkit/Mixin', ['require', 'underscore', 'jquery', 'bkit/Namespace'], func
          */
         function doMixin(mixin, instance) {
             var namespace = getNamespace(instance, mixin.prototype.namespace);
-
             if (mixin.prototype.init) {
                 instance.inits.push(partial(namespace, instance, mixin.prototype.init));
             }
@@ -123,13 +122,6 @@ define('bkit/Mixin', ['require', 'underscore', 'jquery', 'bkit/Namespace'], func
             _.each(instance.inits, function (fn) {
                 fn();
             });
-
-            if (this instanceof MixinContainer) {
-                //invoked with new operator - have to do some extra work
-                for (var i in instance) {
-                    this[i] = instance[i];
-                }
-            }
             //always return instance regardless of how the function was invoked
             return instance;
         }
