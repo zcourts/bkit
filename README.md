@@ -261,3 +261,17 @@ Button.touch.tapped.unsubscribe(myFunc)
 
 //where Button is a Button instance, not the Mixin
 ```
+## Documentation
+
+Documentation is very important. Especially in cases like BKit where so much is being generated automatically.
+BKit's documentation is available at [http://code.zcourts.com/bkit](http://code.zcourts.com/bkit).
+It is automatically generated from the code base using JSDoc.
+The aim is to have 100% coverage on documentation of all modules, methods, properties and events.
+To generate the docs there is a jsdoc.json file in the repo. Use the following
+
+```shell
+jsdoc README.md -c jsdoc.json -t ~/projects/docstrap/template -d ../bkit-docs
+```
+__~/projects/docstrap/template__ is the directory to the JSDoc template. Using the [Docstrap template](https://github.com/terryweiss/docstrap).
+__../bkit-docs__ is a duplicate of the bkit repo, checkedout to the gh-pages branch.
+Once done, commit and push to gh-pages branch of the repo.
