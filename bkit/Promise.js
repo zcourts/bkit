@@ -7,7 +7,7 @@ define('bkit/Promise',
          * Provide a convenient way to apply a function on success or erroor
          * @param success true or false, if true the then function is applied otherwise else is applied
          * @param context the context which is used to execute the callbacks to then and else
-         * @param args* 1 or more arguments to pass to the then/else callbacks
+         * @param {...*} args 1 or more arguments to pass to the then/else callbacks
          * @global
          * @constructor
          */

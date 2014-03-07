@@ -9,6 +9,7 @@ define('bkit/Dispatchable',
         /**
          * Represents any module which can create, have and dispatch events
          * @mixin
+         * @memberof event
          * @global
          */
         function Dispatchable() {
@@ -43,7 +44,7 @@ define('bkit/Dispatchable',
          * @memberof Dispatchable
          */
         Dispatchable.prototype.create = function (self, name, enable_linger, linger_time) {
-            self.e[name] = new SimpleEvent({
+            self.e[name] = SimpleEvent({
                 event: {
                     name: name,
                     enable_signal_lingering: enable_linger !== false,

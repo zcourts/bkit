@@ -82,9 +82,9 @@ define('bkit/Widget',
             return self.instance_id;
         };
 
-        Widget.prototype.toString = function (self) {
-            return JSON.stringify(self);
-        };
+//        Widget.prototype.toString = function (self) {
+//            return JSON.stringify(self);
+//        };
 
         return Widget;
     });

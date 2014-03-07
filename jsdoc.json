@@ -15,10 +15,10 @@
         "systemName": "BKit",
         "footer": "BKit, the lighter, better widget toolkit",
         "copyright": "BKit Copyright © 2014",
-        "navType": "vertical",
+        "navType": "inline",
         "theme": "journal",
         "linenums": true,
-        "collapseSymbols": true,
+        "collapseSymbols": false,
         "inverseNav": true
     },
     "opts": {
