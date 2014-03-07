@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>BKit Mixin: Movable</title>
+	<title>BKit Mixin: EventBinding</title>
 
 	<!--[if lt IE 9]>
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -165,12 +165,12 @@
 					
 
 
-	<h1 class="page-title">Mixin: Movable</h1>
+	<h1 class="page-title">Mixin: EventBinding</h1>
 <section>
 
 <header>
     <h2>
-    Movable
+    EventBinding
     </h2>
     
 </header>
@@ -181,7 +181,7 @@
 
     
         
-            <div class="description">Represents a DOM widget whose position can change</div>
+            <div class="description">A binding is the result of subscribing to an event which allows you to later unsubscribe, even anonymous functions</div>
         
 
         
@@ -207,7 +207,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        Movable.js, line 19
+        EventBinding.js, line 13
     </li></ul></dd>
     
 
@@ -225,16 +225,6 @@
 
     
 
-    
-        <h3 class="subsection-title">Mixes In</h3>
-
-        <ul>
-            <li><a href="Dispatchable.html">Dispatchable</a></li>
-        
-            <li><a href="Displayable.html">Displayable</a></li>
-        
-            <li><a href="Widget.html">Widget</a></li>
-        </ul>
     
 
     
@@ -251,7 +241,7 @@
         <dl>
             
 <dt>
-    <h4 class="name" id="getElement"><span class="type-signature"></span>getElement<span class="signature">(self)</span><span class="type-signature"> &rarr; {jQueryElement}</span></h4>
+    <h4 class="name" id="disable"><span class="type-signature"></span>disable<span class="signature">(self)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -259,7 +249,7 @@
     
     
     <div class="description">
-        Gets the DOM element for this object
+        Disable this binding so that no further events are dispatched to it until it is enabled again
     </div>
     
 
@@ -336,7 +326,164 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        Movable.js, line 51
+        EventBinding.js, line 90
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="dispatch"><span class="type-signature"></span>dispatch<span class="signature">(self, args)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Trigger this event binding. Only the underlying callback will be executed, other bindings that subscribe
+to the same event that produced this binding will not be triggered
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+		<th>Argument</th>
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>self</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+
+        <tr>
+            
+                <td class="name"><code>args</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last">a list of arguments to be passed to the callback</td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        EventBinding.js, line 71
     </li></ul></dd>
     
 
@@ -361,10 +508,355 @@
     
             
 <div class="param-desc">
-    returns a jQuery wrapped DOM element. i.e. you can call any jQuery method directly
-without wrapping it in $()
+    the value returned by the callback
 </div>
 
+
+
+
+        
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="enable"><span class="type-signature"></span>enable<span class="signature">(self)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Enable this binding if it was previously disabled.
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>self</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        EventBinding.js, line 81
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="get"><span class="type-signature"></span>get<span class="signature">(self)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Get the function that was used to subscribe and created this binding
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>self</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        EventBinding.js, line 59
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="isOnce"><span class="type-signature"></span>isOnce<span class="signature">(self)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Check if this binding will only be executed once for the event it was subscribed to
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params table table-striped">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+
+		<th>Type</th>
+
+		
+
+		
+
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+
+	<tbody>
+	
+
+        <tr>
+            
+                <td class="name"><code>self</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+	
+	</tbody>
+</table>
+
+    
+    
+    
+<dl class="details">
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        EventBinding.js, line 39
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+    
+    
+
+    
+
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
 
 
 <dl>
@@ -373,7 +865,7 @@ without wrapping it in $()
 	</dt>
 	<dd>
 		
-<span class="param-type">jQueryElement</span>
+<span class="param-type">Boolean</span>
 
 
 	</dd>
@@ -388,7 +880,7 @@ without wrapping it in $()
         
             
 <dt>
-    <h4 class="name" id="position"><span class="type-signature"></span>position<span class="signature">(self)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+    <h4 class="name" id="unsubscribe"><span class="type-signature"></span>unsubscribe<span class="signature">(self)</span><span class="type-signature"></span></h4>
     
     
 </dt>
@@ -396,7 +888,9 @@ without wrapping it in $()
     
     
     <div class="description">
-        Gets the current position of this element
+        Unsubscribes this binding permanently for it to stop receiving events.
+This binding is effectively inert after invoking this.
+If you intend to re-activate this binding again, use <a href="EventBinding.html#disable"><code>EventBinding#disable</code></a> and <a href="EventBinding.html#enable"><code>EventBinding#enable</code></a>
     </div>
     
 
@@ -473,7 +967,7 @@ without wrapping it in $()
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        Movable.js, line 40
+        EventBinding.js, line 50
     </li></ul></dd>
     
 
@@ -494,30 +988,6 @@ without wrapping it in $()
     
     
     
-    <h5>Returns:</h5>
-    
-            
-<div class="param-desc">
-    an object with top and left properties indicating the top and left offsets of the dom element
-e.g. {top:10,left:30}
-</div>
-
-
-
-<dl>
-	<dt>
-		Type
-	</dt>
-	<dd>
-		
-<span class="param-type">Object</span>
-
-
-	</dd>
-</dl>
-
-
-        
     
     
 </dd>
